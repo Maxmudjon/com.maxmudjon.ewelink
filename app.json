@@ -1,0 +1,529 @@
+{
+  "id": "com.maxmudjon.ewelink",
+  "version": "1.0.0",
+  "compatibility": ">=2.2.0",
+  "sdk": 2,
+  "name": {
+    "en": "Ewelink"
+  },
+  "description": {
+    "en": "Ewelink for Athom Homey"
+  },
+  "category": ["tools"],
+  "permissions": [],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "brandColor": "#007EC8",
+  "author": {
+    "name": "Maxmudjon Payziyev",
+    "email": "bio42@mail.ru"
+  },
+  "drivers": [
+    {
+      "id": "sonoff-basic",
+      "name": {
+        "en": "Sonoff Basic"
+      },
+      "class": "light",
+      "capabilities": ["onoff"],
+      "images": {
+        "large": "/drivers/sonoff-basic/assets/images/large.png",
+        "small": "/drivers/sonoff-basic/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    },
+    {
+      "id": "sonoff-pow-r2",
+      "name": {
+        "en": "Sonoff Pow R2"
+      },
+      "class": "socket",
+      "capabilities": ["onoff", "measure_power", "meter_power", "measure_voltage"],
+      "images": {
+        "large": "/drivers/sonoff-pow-r2/assets/images/large.png",
+        "small": "/drivers/sonoff-pow-r2/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ]
+    },
+    {
+      "id": "coolkit-socket",
+      "name": {
+        "en": "Coolkit Socket"
+      },
+      "class": "socket",
+      "capabilities": ["onoff", "measure_power", "meter_power", "measure_voltage"],
+      "images": {
+        "large": "/drivers/coolkit-socket/assets/images/large.png",
+        "small": "/drivers/coolkit-socket/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sonoff-sc",
+      "name": {
+        "en": "Sonoff SC"
+      },
+      "class": "sensor",
+      "capabilities": ["measure_pm25", "measure_humidity", "measure_luminance", "measure_noise", "measure_temperature"],
+      "images": {
+        "large": "/drivers/sonoff-sc/assets/images/large.png",
+        "small": "/drivers/sonoff-sc/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sonoff-t1-2c",
+      "name": {
+        "en": "Sonoff T1 2C"
+      },
+      "class": "light",
+      "capabilities": ["onoff", "onoff.1"],
+      "capabilitiesOptions": {
+        "onoff": {
+          "title": {
+            "en": "1 channel"
+          }
+        },
+        "onoff.1": {
+          "title": {
+            "en": "2 channel"
+          }
+        }
+      },
+      "images": {
+        "large": "/drivers/sonoff-t1-2c/assets/images/large.png",
+        "small": "/drivers/sonoff-t1-2c/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "mac",
+              "type": "label",
+              "label": {
+                "en": "MAC"
+              },
+              "value": "mac_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "circuit-breaker-zjsb9",
+      "name": {
+        "en": "Circuit Breaker"
+      },
+      "class": "light",
+      "capabilities": ["onoff"],
+      "images": {
+        "large": "/drivers/circuit-breaker-zjsb9/assets/images/large.png",
+        "small": "/drivers/circuit-breaker-zjsb9/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "mac",
+              "type": "label",
+              "label": {
+                "en": "MAC"
+              },
+              "value": "mac_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coolkit-outdoor-socket",
+      "name": {
+        "en": "Coolkit Outdoor Socket"
+      },
+      "class": "socket",
+      "capabilities": ["onoff"],
+      "images": {
+        "large": "/drivers/coolkit-outdoor-socket/assets/images/large.png",
+        "small": "/drivers/coolkit-outdoor-socket/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sonoff-mini",
+      "name": {
+        "en": "Sonoff Mini"
+      },
+      "class": "socket",
+      "capabilities": ["onoff"],
+      "images": {
+        "large": "/drivers/sonoff-mini/assets/images/large.png",
+        "small": "/drivers/sonoff-mini/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "com.maxmudjon.ewelink",
+  "version": "1.0.0",
+  "description": "ewelink",
+  "main": "app.js",
+  "dependencies": {
+    "nonce": "^1.0.4",
+    "request-json": "^0.6.4",
+    "ws": "^7.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ewelink",
+    "homey"
+  ],
+  "author": "Payziyev Maxmudjon",
+  "license": "ISC"
+}
