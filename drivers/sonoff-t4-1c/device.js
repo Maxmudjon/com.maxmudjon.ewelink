@@ -2,7 +2,7 @@
 
 const Homey = require("homey");
 
-class SonoffBasic extends Homey.Device {
+class SonoffT41C extends Homey.Device {
   onInit() {
     this.log("Sonoff Basic has been inited");
     this.driver = this.getDriver();
@@ -13,6 +13,7 @@ class SonoffBasic extends Homey.Device {
   }
 
   handleStateChange(device) {
+    console.log("[INFO]: SonoffT41C -> handleStateChange -> device", device);
     if (device.params) {
       if (device.params.switch == "on")
         this.updateCapabilityValue("onoff", true);
@@ -85,4 +86,4 @@ class SonoffBasic extends Homey.Device {
   }
 }
 
-module.exports = SonoffBasic;
+module.exports = SonoffT41C;

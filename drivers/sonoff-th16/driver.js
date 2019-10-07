@@ -1,9 +1,9 @@
 "use strict";
 
 const Homey = require("homey");
-const model = "PSC-B67-GL";
+const model = "TH16";
 
-class CoolkitSocket extends Homey.Driver {
+class SonoffTH16 extends Homey.Driver {
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
@@ -61,4 +61,4 @@ class CoolkitSocket extends Homey.Driver {
   }
 }
 
-module.exports = CoolkitSocket;
+module.exports = SonoffTH16;

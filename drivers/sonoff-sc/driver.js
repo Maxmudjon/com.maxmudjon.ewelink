@@ -4,20 +4,37 @@ const Homey = require("homey");
 const model = "Sonoff SC";
 
 class SonoffSC extends Homey.Driver {
-  onInit() {
-    this.log("Sonoff SC has been inited");
-  }
-
-  onPairListDevices(data, callback) {
-    Homey.app.ewelinkApi
-      .getDevices(model)
-      .then(devices => callback(null, this.deviceList(devices)))
-      .catch(() => callback(Homey.__("pair.no_devices_found")));
+  async onPairListDevices(data, callback) {
+    await Homey.app.ewelinkApi
+      .getDevices()
+      .then(devices => {
+        if (devices.msg == "params incomplete") {
+          callback(new Error("Please try again"));
+          return;
+        } else if (devices.msg == "Authentication error") {
+          callback(new Error("Please login to the plugin settings"));
+          return;
+        } else if (
+          devices.msg ==
+          '{"oauth_authorise":"tokenInfo is not exit:d9491c1aa638d7d12e65b3e6a46c247d0aa67d28"}'
+        ) {
+          callback(new Error("Please restart plugin"));
+          return;
+        } else {
+          callback(
+            null,
+            this.deviceList(
+              devices.filter(device => device.productModel == model)
+            )
+          );
+        }
+      })
+      .catch(error => callback(new Error(error)));
   }
 
   deviceList(devices) {
     let sortDevices = [];
-    console.log(JSON.stringify(devices));
+
     for (var device of devices) {
       let deviceList = {
         name: device.productModel + " " + device.name,
@@ -30,7 +47,12 @@ class SonoffSC extends Homey.Driver {
           brandName: device.brandName,
           model: device.productModel,
           ip: device.ip,
-          fwVersion: device.params.fwVersion
+          mac: device.params.staMac,
+          fwVersion: device.params.fwVersion,
+          powerResponse: device.params.startup,
+          networkLed: device.params.sledOnline,
+          duration: device.params.pulse,
+          durationLimit: parseFloat(device.params.pulseWidth / 1000)
         }
       };
       sortDevices.push(deviceList);

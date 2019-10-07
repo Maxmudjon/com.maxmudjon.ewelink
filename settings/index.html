@@ -1,7 +1,14 @@
 <html lang="en">
   <head>
-    <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <script
+      type="text/javascript"
+      src="/homey.js"
+      data-origin="settings"
+    ></script>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
     <script src="../assets/vue.min.js"></script>
     <link rel="stylesheet" href="../assets/bulma.min.css" />
   </head>
@@ -11,37 +18,84 @@
         <div v-show="alert" id="alert" class="notification is-danger">
           Alert
         </div>
-        <div v-if="page == 'login'" class="card equal-height" style="border-radius: 5px;">
+        <div
+          v-if="page == 'login'"
+          class="card equal-height"
+          style="border-radius: 5px;"
+        >
           <div class="card-content is-flex is-horizontal-center">
-            <figure class="image is-64x64"><img src="../assets/logo.png" /></figure>
+            <figure class="image is-64x64">
+              <img src="../assets/logo.png" />
+            </figure>
           </div>
           <div class="card-content columns">
             <div class="column  is-4">
-              <input class="input" type="text" placeholder="Phone or email" v-model="login" />
+              <input
+                class="input"
+                type="text"
+                placeholder="Phone or email"
+                v-model="login"
+              />
             </div>
             <div class="column is-4">
-              <input class="input" type="password" placeholder="Password" v-model="password" />
+              <input
+                class="input"
+                type="password"
+                placeholder="Password"
+                v-model="password"
+              />
             </div>
             <div class="column is-4">
-              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);" class="button is-primary is-fullwidth" @click="signin" :disabled="empty">Sign in</button>
+              <button
+                type="button"
+                style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);"
+                class="button is-primary is-fullwidth"
+                @click="signin"
+                :disabled="empty"
+              >
+                Sign in
+              </button>
             </div>
           </div>
         </div>
-        <div v-if="page == 'profile'" class="card equal-height" style="border-radius: 5px;">
+        <div
+          v-if="page == 'profile'"
+          class="card equal-height"
+          style="border-radius: 5px;"
+        >
           <div class="card-content is-flex is-horizontal-center">
-            <figure class="image is-64x64"><img src="../assets/logo.png" /></figure>
+            <figure class="image is-64x64">
+              <img src="../assets/logo.png" />
+            </figure>
           </div>
           <div class="card-content columns">
             <div class="column  is-4">
               <label class="label">Hello</label>
-              <input class="input is-static" type="text" :value="login" readonly />
+              <input
+                class="input is-static"
+                type="text"
+                :value="login"
+                readonly
+              />
             </div>
             <div class="column  is-4">
               <label class="label">Connected devices</label>
-              <input class="input is-static" type="number" :value="deviceCount" readonly />
+              <input
+                class="input is-static"
+                type="number"
+                :value="deviceCount"
+                readonly
+              />
             </div>
             <div class="column is-4">
-              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);" class="button is-primary is-fullwidth" @click="logout">Logout</button>
+              <button
+                type="button"
+                style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);"
+                class="button is-primary is-fullwidth"
+                @click="logout"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -54,18 +108,14 @@
           el: "#ewelink",
           data() {
             return {
-              host: null,
               login: null,
               password: null,
-              imei: null,
               alert: false,
               page: "login",
               deviceCount: 0
             };
           },
           mounted() {
-            this.imei = this.generateIMEI();
-
             Homey.get("account", (err, user) => {
               let alert = document.getElementById("alert");
               if (err) {
@@ -75,7 +125,6 @@
               }
               this.login = user.login;
               this.password = user.password;
-              this.imei = user.imei;
 
               Homey.api("POST", "/getDevices", user, (error, result) => {
                 if (result.status == "error") {
@@ -93,8 +142,7 @@
               let alert = document.getElementById("alert");
               let signData = {
                 login: this.login,
-                password: this.password,
-                imei: this.imei
+                password: this.password
               };
 
               Homey.api("POST", "/getDevices", signData, (error, result) => {
@@ -129,7 +177,6 @@
               this.page = "login";
               this.deviceCount = 0;
               this.password = null;
-              this.imei = null;
 
               Homey.unset("account", err => {
                 if (err) {
@@ -140,20 +187,16 @@
                 alert.classList.add("is-success");
                 alert.innerText = "logout successfully";
               });
-            },
-            generateIMEI() {
-              return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-                .replace(/[xy]/g, function(c) {
-                  var r = (Math.random() * 16) | 0,
-                    v = c == "x" ? r : (r & 0x3) | 0x8;
-                  return v.toString(16);
-                })
-                .toUpperCase();
             }
           },
           computed: {
             empty() {
-              if (this.login != null && this.login != "" && this.password != null && this.password != "") {
+              if (
+                this.login != null &&
+                this.login != "" &&
+                this.password != null &&
+                this.password != ""
+              ) {
                 return false;
               } else return true;
             }

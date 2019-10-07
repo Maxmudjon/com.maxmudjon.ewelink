@@ -5,8 +5,8 @@ module.exports = [
   {
     method: "POST",
     path: "/getDevices",
-    fn: function(args, callback) {
-      Homey.app
+    fn: async (args, callback) => {
+      await Homey.app
         .getDevices(args)
         .then(res => {
           callback(null, res);

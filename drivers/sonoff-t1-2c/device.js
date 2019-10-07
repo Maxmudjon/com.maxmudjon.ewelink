@@ -1,7 +1,7 @@
 "use strict";
 
 const Homey = require("homey");
-const model = "Sonoff SC";
+const model = "T1 2C";
 
 class SonoffT12C extends Homey.Device {
   onInit() {
@@ -19,12 +19,11 @@ class SonoffT12C extends Homey.Device {
   }
 
   handleStateChange(device) {
-    console.log("[INFO]: SonoffT12C -> handleStateChange -> device", device);
     if (device.params && device.params.switches) {
-      device.params.switches.forEach((deviceStich, index) => {
-        console.log(deviceStich + " : " + index);
-      });
-      if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
+      if (device.params.switches[0].switch == "on") this.updateCapabilityValue("onoff", true);
+      else if (device.params.switches[0].switch == "off") this.updateCapabilityValue("onoff", false);
+      if (device.params.switches[1].switch == "on") this.updateCapabilityValue("onoff.1", true);
+      else if (device.params.switches[1].switch == "off") this.updateCapabilityValue("onoff", false);
     }
   }
 
@@ -41,8 +40,22 @@ class SonoffT12C extends Homey.Device {
       apikey: this.data.apikey
     };
     this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setPowerState(data, value);
-      console.log("[INFO]: SonoffT12C -> registerToggle -> data" + data + " CAPAB" + name);
+      let channels = [
+        { "outlet": 0, "switch": "on" },
+        { "outlet": 1, "switch": "on" },
+        { "outlet": 2, "switch": "on" },
+        { "outlet": 3, "switch": "on" }
+      ]
+      if (name == 'onoff') {
+        channels[0].switch = value ? "on" : "off"
+        channels[1].switch = this.getCapabilityValue('onoff.1') ? "on" : "off"
+      } else if (name == 'onoff.1') {
+        channels[1].switch = value ? "on" : "off"
+        channels[0].switch = this.getCapabilityValue('onoff') ? "on" : "off"
+      }
+
+      Homey.app.ewelinkApi.setPower2State(data, channels);
+      console.log("[INFO]: SonoffT12C -> registerToggle -> data" + data + " CAPAB " + name);
 
       // this.triggerFlow(trigger, name, value);
     });

@@ -19,7 +19,6 @@ class Ewelink extends Homey.App {
         this.ewelinkApi.destroy();
         this.ewelinkApi.connect();
         break;
-
       default:
         break;
     }
