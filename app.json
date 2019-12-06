@@ -1,6 +1,6 @@
 {
   "id": "com.maxmudjon.ewelink",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": ">=2.2.0",
   "sdk": 2,
   "name": {
@@ -187,12 +187,7 @@
         "en": "Sonoff Pow R2"
       },
       "class": "socket",
-      "capabilities": [
-        "onoff",
-        "measure_power",
-        "meter_power",
-        "measure_voltage"
-      ],
+      "capabilities": ["onoff", "measure_power", "meter_power", "measure_voltage"],
       "images": {
         "large": "/drivers/sonoff-pow-r2/assets/images/large.png",
         "small": "/drivers/sonoff-pow-r2/assets/images/small.png"
@@ -352,12 +347,7 @@
         "en": "Coolkit Socket"
       },
       "class": "socket",
-      "capabilities": [
-        "onoff",
-        "measure_power",
-        "meter_power",
-        "measure_voltage"
-      ],
+      "capabilities": ["onoff", "measure_power", "meter_power", "measure_voltage"],
       "images": {
         "large": "/drivers/coolkit-socket/assets/images/large.png",
         "small": "/drivers/coolkit-socket/assets/images/small.png"
@@ -517,13 +507,7 @@
         "en": "Sonoff SC"
       },
       "class": "sensor",
-      "capabilities": [
-        "measure_pm25",
-        "measure_humidity",
-        "measure_luminance",
-        "measure_noise",
-        "measure_temperature"
-      ],
+      "capabilities": ["measure_pm25", "measure_humidity", "measure_luminance", "measure_noise", "measure_temperature"],
       "images": {
         "large": "/drivers/sonoff-sc/assets/images/large.png",
         "small": "/drivers/sonoff-sc/assets/images/small.png"
@@ -1825,6 +1809,284 @@
             },
             {
               "id": "durationLimit",
+              "type": "number",
+              "label": {
+                "en": "Duration seconds"
+              },
+              "value": 0.5,
+              "min": 0.5,
+              "max": 3600
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sonoff-4ch-pro",
+      "name": {
+        "en": "Sonoff 4CH Pro"
+      },
+      "class": "light",
+      "capabilities": ["onoff", "onoff.1", "onoff.2", "onoff.3"],
+      "capabilitiesOptions": {
+        "onoff": {
+          "title": {
+            "en": "1 channel"
+          }
+        },
+        "onoff.1": {
+          "title": {
+            "en": "2 channel"
+          }
+        },
+        "onoff.2": {
+          "title": {
+            "en": "3 channel"
+          }
+        },
+        "onoff.3": {
+          "title": {
+            "en": "4 channel"
+          }
+        }
+      },
+      "images": {
+        "large": "/drivers/sonoff-4ch-pro/assets/images/large.png",
+        "small": "/drivers/sonoff-4ch-pro/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Extra settings"
+          },
+          "children": [
+            {
+              "id": "powerResponse",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Power-on response"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                },
+                {
+                  "id": "stay",
+                  "label": {
+                    "en": "Resume the state before power outage"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "networkLed",
+              "type": "dropdown",
+              "value": "on",
+              "label": {
+                "en": "Network indicator"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "duration1channel",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Duration 1 channel"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "durationLimit1channel",
+              "type": "number",
+              "label": {
+                "en": "Duration seconds"
+              },
+              "value": 0.5,
+              "min": 0.5,
+              "max": 3600
+            },
+            {
+              "id": "duration2channel",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Duration 2 channel"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "durationLimit2channel",
+              "type": "number",
+              "label": {
+                "en": "Duration seconds"
+              },
+              "value": 0.5,
+              "min": 0.5,
+              "max": 3600
+            },
+            {
+              "id": "duration3channel",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Duration 3 channel"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "durationLimit3channel",
+              "type": "number",
+              "label": {
+                "en": "Duration seconds"
+              },
+              "value": 0.5,
+              "min": 0.5,
+              "max": 3600
+            },
+            {
+              "id": "duration4channel",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Duration 4 channel"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "durationLimit4channel",
               "type": "number",
               "label": {
                 "en": "Duration seconds"

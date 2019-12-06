@@ -1,10 +1,11 @@
 {
   "name": "com.maxmudjon.ewelink",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ewelink",
   "main": "app.js",
   "dependencies": {
     "nonce": "^1.0.4",
+    "querystring": "^0.2.0",
     "request-json": "^0.6.4",
     "ws": "^7.1.2"
   },
