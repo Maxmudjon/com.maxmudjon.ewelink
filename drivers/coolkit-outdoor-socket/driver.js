@@ -1,33 +1,14 @@
 "use strict";
 
 const Homey = require("homey");
-const model = "PS-16";
+const models = ["PS-16"];
 
 class CoolKitOutdoorSocket extends Homey.Driver {
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
       .then(devices => {
-        if (devices.msg == "params incomplete") {
-          callback(new Error("Please try again"));
-          return;
-        } else if (devices.msg == "Authentication error") {
-          callback(new Error("Please login to the plugin settings"));
-          return;
-        } else if (
-          devices.msg ==
-          '{"oauth_authorise":"tokenInfo is not exit:d9491c1aa638d7d12e65b3e6a46c247d0aa67d28"}'
-        ) {
-          callback(new Error("Please restart plugin"));
-          return;
-        } else {
-          callback(
-            null,
-            this.deviceList(
-              devices.filter(device => device.productModel == model)
-            )
-          );
-        }
+        callback(null, this.deviceList(devices.devicelist.filter(device => models.includes(device.productModel))));
       })
       .catch(error => callback(new Error(error)));
   }

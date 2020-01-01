@@ -14,10 +14,8 @@ class SonoffBasic extends Homey.Device {
 
   handleStateChange(device) {
     if (device.params) {
-      if (device.params.switch == "on")
-        this.updateCapabilityValue("onoff", true);
-      if (device.params.switch == "off")
-        this.updateCapabilityValue("onoff", false);
+      if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
+      if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
       if (device.params.startup && !this.saving)
         this.setSettings({
           powerResponse: device.params.startup
@@ -51,9 +49,7 @@ class SonoffBasic extends Homey.Device {
       apikey: this.data.apikey
     };
 
-    Homey.app.ewelinkApi
-      .setParams(data, params)
-      .then(() => callback(null, true));
+    Homey.app.ewelinkApi.setParams(data, params).then(() => callback(null, true));
   }
 
   updateCapabilityValue(name, value, trigger) {
@@ -73,15 +69,16 @@ class SonoffBasic extends Homey.Device {
   }
 
   registerStateChangeListener() {
-    Homey.app.ewelinkApi.on(`${this.data.deviceid}`, event =>
-      this.handleStateChange(event)
-    );
+    Homey.app.ewelinkApi.on(this.data.deviceid, this.handleStateChange);
   }
 
   unregisterStateChangeListener() {
-    Homey.app.ewelinkApi.removeListener(`${this.data.deviceid}`, event =>
-      this.handleStateChange(event)
-    );
+    Homey.app.ewelinkApi.removeListener(this.data.deviceid, this.handleStateChange);
+  }
+
+  onDeleted() {
+    this.unregisterStateChangeListener();
+    this.log("Device deleted");
   }
 }
 

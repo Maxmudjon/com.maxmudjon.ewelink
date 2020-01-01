@@ -1,33 +1,16 @@
 "use strict";
 
 const Homey = require("homey");
-const model = "Pow_R2";
+const models = ["Sonoff Pow", "Pow_R2"];
 
-class MyDriver extends Homey.Driver {
+const deviceCapabilities = { "Sonoff Pow": ["onoff", "measure_power"], Pow_R2: ["onoff", "measure_power", "meter_power", "measure_voltage"] };
+
+class SonoffPow extends Homey.Driver {
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
       .then(devices => {
-        if (devices.msg == "params incomplete") {
-          callback(new Error("Please try again"));
-          return;
-        } else if (devices.msg == "Authentication error") {
-          callback(new Error("Please login to the plugin settings"));
-          return;
-        } else if (
-          devices.msg ==
-          '{"oauth_authorise":"tokenInfo is not exit:d9491c1aa638d7d12e65b3e6a46c247d0aa67d28"}'
-        ) {
-          callback(new Error("Please restart plugin"));
-          return;
-        } else {
-          callback(
-            null,
-            this.deviceList(
-              devices.filter(device => device.productModel == model)
-            )
-          );
-        }
+        callback(null, this.deviceList(devices.devicelist.filter(device => models.includes(device.productModel))));
       })
       .catch(error => callback(new Error(error)));
   }
@@ -43,6 +26,7 @@ class MyDriver extends Homey.Driver {
           apikey: device.apikey,
           extra: device.extra.extra
         },
+        capabilities: deviceCapabilities[device.productModel],
         settings: {
           brandName: device.brandName,
           model: device.productModel,
@@ -61,4 +45,4 @@ class MyDriver extends Homey.Driver {
   }
 }
 
-module.exports = MyDriver;
+module.exports = SonoffPow;

@@ -3,7 +3,6 @@
 const Homey = require("homey");
 const model = "TH16";
 
-
 class SonoffTH16 extends Homey.Device {
   onInit() {
     this.log("Sonoff TH16 has been inited");
@@ -26,21 +25,22 @@ class SonoffTH16 extends Homey.Device {
       if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
       if (device.params.currentTemperature) this.updateCapabilityValue("measure_temperature", parseInt(device.params.currentTemperature));
       if (device.params.currentHumidity) this.updateCapabilityValue("measure_humidity", parseInt(device.params.currentHumidity));
-      if (device.params.sensorType) this.setSettings({
-        sensorType: device.params.sensorType
-      });
+      if (device.params.sensorType)
+        this.setSettings({
+          sensorType: device.params.sensorType
+        });
 
       if (device.params.deviceType == "temperature") {
         this.setSettings({
-          thermostatMode: 'temperature',
+          thermostatMode: "temperature",
           targetHighTemperature: parseInt(device.params.targets[0].targetHigh),
           highTemperatureThreshold: device.params.targets[0].reaction.switch,
           targetLowTemperature: parseInt(device.params.targets[1].targetLow),
           lowTemperatureThreshold: device.params.targets[1].reaction.switch
-        })
+        });
       } else if (device.params.deviceType == "humidity") {
         this.setSettings({
-          thermostatMode: 'humidity',
+          thermostatMode: "humidity",
           targetHighHumidity: device.params.targets[0].targetHigh,
           highTemperatureThreshold: parseInt(device.params.targets[0].reaction.switch),
           targetLowHumidity: parseInt(device.params.targets[1].targetLow),
@@ -48,18 +48,16 @@ class SonoffTH16 extends Homey.Device {
         });
       } else if (device.params.deviceType == "normal") {
         this.setSettings({
-          thermostatMode: 'off'
+          thermostatMode: "off"
         });
       }
     }
-
-
   }
 
   async onSettings(oldSettingsObj, newSettingsObj, changedKeysArr, callback) {
     if (changedKeysArr) {
       if (changedKeysArr.includes("thermostatMode")) {
-        this.log('Thermostat mode changed to: ', newSettingsObj.thermostatMode)
+        this.log("Thermostat mode changed to: ", newSettingsObj.thermostatMode);
         let data = {
           deviceid: this.data.deviceid,
           apikey: this.data.apikey
@@ -68,7 +66,7 @@ class SonoffTH16 extends Homey.Device {
       }
 
       if (changedKeysArr.includes("targetHighTemperature")) {
-        this.log('Thermostat mode changed to: ', newSettingsObj.targetHighTemperature)
+        this.log("Thermostat mode changed to: ", newSettingsObj.targetHighTemperature);
         let data = {
           deviceid: this.data.deviceid,
           apikey: this.data.apikey
@@ -95,11 +93,16 @@ class SonoffTH16 extends Homey.Device {
   }
 
   registerStateChangeListener() {
-    Homey.app.ewelinkApi.on(`${this.data.deviceid}`, this.handleStateChange);
+    Homey.app.ewelinkApi.on(this.data.deviceid, this.handleStateChange);
   }
 
   unregisterStateChangeListener() {
-    Homey.app.ewelinkApi.removeListener(`${this.data.deviceid}`, this.handleStateChange);
+    Homey.app.ewelinkApi.removeListener(this.data.deviceid, this.handleStateChange);
+  }
+
+  onDeleted() {
+    this.unregisterStateChangeListener();
+    this.log("Device deleted");
   }
 }
 

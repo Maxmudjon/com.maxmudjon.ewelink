@@ -40,18 +40,13 @@ class SonoffT12C extends Homey.Device {
       apikey: this.data.apikey
     };
     this.registerCapabilityListener(name, async value => {
-      let channels = [
-        { "outlet": 0, "switch": "on" },
-        { "outlet": 1, "switch": "on" },
-        { "outlet": 2, "switch": "on" },
-        { "outlet": 3, "switch": "on" }
-      ]
-      if (name == 'onoff') {
-        channels[0].switch = value ? "on" : "off"
-        channels[1].switch = this.getCapabilityValue('onoff.1') ? "on" : "off"
-      } else if (name == 'onoff.1') {
-        channels[1].switch = value ? "on" : "off"
-        channels[0].switch = this.getCapabilityValue('onoff') ? "on" : "off"
+      let channels = [{ outlet: 0, switch: "on" }, { outlet: 1, switch: "on" }, { outlet: 2, switch: "on" }, { outlet: 3, switch: "on" }];
+      if (name == "onoff") {
+        channels[0].switch = value ? "on" : "off";
+        channels[1].switch = this.getCapabilityValue("onoff.1") ? "on" : "off";
+      } else if (name == "onoff.1") {
+        channels[1].switch = value ? "on" : "off";
+        channels[0].switch = this.getCapabilityValue("onoff") ? "on" : "off";
       }
 
       Homey.app.ewelinkApi.setPower2State(data, channels);
@@ -62,11 +57,16 @@ class SonoffT12C extends Homey.Device {
   }
 
   registerStateChangeListener() {
-    Homey.app.ewelinkApi.on(`${this.data.deviceid}`, this.handleStateChange);
+    Homey.app.ewelinkApi.on(this.data.deviceid, this.handleStateChange);
   }
 
   unregisterStateChangeListener() {
-    Homey.app.ewelinkApi.removeListener(`${this.data.deviceid}`, this.handleStateChange);
+    Homey.app.ewelinkApi.removeListener(this.data.deviceid, this.handleStateChange);
+  }
+
+  onDeleted() {
+    this.unregisterStateChangeListener();
+    this.log("Device deleted");
   }
 }
 

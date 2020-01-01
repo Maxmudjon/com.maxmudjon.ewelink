@@ -1,28 +1,17 @@
 <html lang="en">
   <head>
-    <script
-      type="text/javascript"
-      src="/homey.js"
-      data-origin="settings"
-    ></script>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
-    />
+    <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <script src="../assets/vue.min.js"></script>
     <link rel="stylesheet" href="../assets/bulma.min.css" />
   </head>
   <body style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);">
     <div id="ewelink" style="padding: 10px;">
       <div class="container">
-        <div v-show="alert" id="alert" class="notification is-danger">
+        <div v-show="alert" id="alert" class="notification is-danger" style="margin-bottom: 10px;">
           Alert
         </div>
-        <div
-          v-if="page == 'login'"
-          class="card equal-height"
-          style="border-radius: 5px;"
-        >
+        <div v-if="page == 'login'" class="card equal-height" style="border-radius: 5px;">
           <div class="card-content is-flex is-horizontal-center">
             <figure class="image is-64x64">
               <img src="../assets/logo.png" />
@@ -30,39 +19,19 @@
           </div>
           <div class="card-content columns">
             <div class="column  is-4">
-              <input
-                class="input"
-                type="text"
-                placeholder="Phone or email"
-                v-model="login"
-              />
+              <input class="input" type="text" placeholder="Phone or email" v-model="login" @change="onEdit" style="FONT-WEIGHT: 600; padding-left: 10px; padding-top: 6px;" />
             </div>
             <div class="column is-4">
-              <input
-                class="input"
-                type="password"
-                placeholder="Password"
-                v-model="password"
-              />
+              <input class="input" type="password" placeholder="Password" v-model="password" @change="onEdit" style="FONT-WEIGHT: 600; padding-left: 10px; padding-top: 6px;" />
             </div>
             <div class="column is-4">
-              <button
-                type="button"
-                style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);"
-                class="button is-primary is-fullwidth"
-                @click="signin"
-                :disabled="empty"
-              >
-                Sign in
+              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);" class="button is-primary is-fullwidth" @click="signin" :disabled="empty">
+                {{ buttonText }}
               </button>
             </div>
           </div>
         </div>
-        <div
-          v-if="page == 'profile'"
-          class="card equal-height"
-          style="border-radius: 5px;"
-        >
+        <div v-if="page == 'profile'" class="card equal-height" style="border-radius: 5px;">
           <div class="card-content is-flex is-horizontal-center">
             <figure class="image is-64x64">
               <img src="../assets/logo.png" />
@@ -71,29 +40,14 @@
           <div class="card-content columns">
             <div class="column  is-4">
               <label class="label">Hello</label>
-              <input
-                class="input is-static"
-                type="text"
-                :value="login"
-                readonly
-              />
+              <input class="input is-static" type="text" :value="login" readonly />
             </div>
             <div class="column  is-4">
               <label class="label">Connected devices</label>
-              <input
-                class="input is-static"
-                type="number"
-                :value="deviceCount"
-                readonly
-              />
+              <input class="input is-static" type="number" :value="deviceCount" readonly />
             </div>
             <div class="column is-4">
-              <button
-                type="button"
-                style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);"
-                class="button is-primary is-fullwidth"
-                @click="logout"
-              >
+              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);" class="button is-primary is-fullwidth" @click="logout">
                 Logout
               </button>
             </div>
@@ -112,7 +66,9 @@
               password: null,
               alert: false,
               page: "login",
-              deviceCount: 0
+              deviceCount: 0,
+              buttonText: "Loading...",
+              loading: true
             };
           },
           mounted() {
@@ -123,22 +79,32 @@
                 this.alert = true;
                 return Homey.alert(err);
               }
-              this.login = user.login;
-              this.password = user.password;
 
-              Homey.api("POST", "/getDevices", user, (error, result) => {
-                if (result.status == "error") {
-                  this.alert = true;
-                  alert.innerHTML = result.msg;
-                  return;
-                }
-                this.page = "profile";
-                this.deviceCount = result.length;
-              });
+              if (user == null) {
+                this.loading = false;
+                this.buttonText = "Sign in";
+              } else {
+                this.login = user.login;
+                this.password = user.password;
+
+                Homey.api("POST", "/getDevices", user, (error, result) => {
+                  if (result.status == "error") {
+                    this.alert = true;
+                    alert.innerHTML = result.msg;
+                    return;
+                  }
+                  this.page = "profile";
+                  this.deviceCount = result.devicelist.length;
+                  this.loading = false;
+                  this.buttonText = "Sign in";
+                });
+              }
             });
           },
           methods: {
             signin() {
+              this.loading = true;
+              this.buttonText = "Loading...";
               let alert = document.getElementById("alert");
               let signData = {
                 login: this.login,
@@ -149,17 +115,16 @@
                 if (result.status == "error") {
                   this.alert = true;
                   alert.innerHTML = result.msg;
+                  alert.classList.remove("is-success");
+                  alert.classList.add("is-danger");
+                  this.loading = false;
+                  this.buttonText = "Sign in";
 
-                  setTimeout(() => {
-                    this.alert = false;
-                    alert.classList.remove("is-success");
-                    alert.classList.add("is-danger");
-                  }, 2000);
                   return;
                 }
 
                 this.page = "profile";
-                this.deviceCount = result.length;
+                this.deviceCount = result.devicelist.length;
 
                 Homey.set("account", signData, error => {
                   if (error) {
@@ -169,6 +134,8 @@
                   alert.classList.remove("is-danger");
                   alert.classList.add("is-success");
                   alert.innerText = "Saved";
+                  this.loading = false;
+                  this.buttonText = "Sign in";
                 });
               });
             },
@@ -177,26 +144,29 @@
               this.page = "login";
               this.deviceCount = 0;
               this.password = null;
+              this.loading = false;
+              this.buttonText = "Sign in";
 
               Homey.unset("account", err => {
                 if (err) {
                   alert.innerText = err;
-                  return Homey.alert(err);
+                  // return Homey.alert(err);
                 }
                 alert.classList.remove("is-danger");
                 alert.classList.add("is-success");
                 alert.innerText = "logout successfully";
               });
+            },
+            onEdit() {
+              let alert = document.getElementById("alert");
+              this.alert = false;
+              alert.classList.remove("is-success");
+              alert.classList.add("is-danger");
             }
           },
           computed: {
             empty() {
-              if (
-                this.login != null &&
-                this.login != "" &&
-                this.password != null &&
-                this.password != ""
-              ) {
+              if (!!this.login && this.login != "" && !!this.password && this.password != "" && !this.loading) {
                 return false;
               } else return true;
             }

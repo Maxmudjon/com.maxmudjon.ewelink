@@ -110,11 +110,16 @@ class Sonoff4CHPro extends Homey.Device {
   }
 
   registerStateChangeListener() {
-    Homey.app.ewelinkApi.on(`${this.data.deviceid}`, event => this.handleStateChange(event));
+    Homey.app.ewelinkApi.on(this.data.deviceid, event => this.handleStateChange(event));
   }
 
   unregisterStateChangeListener() {
-    Homey.app.ewelinkApi.removeListener(`${this.data.deviceid}`, event => this.handleStateChange(event));
+    Homey.app.ewelinkApi.removeListener(this.data.deviceid, event => this.handleStateChange(event));
+  }
+
+  onDeleted() {
+    this.unregisterStateChangeListener();
+    this.log("Device deleted");
   }
 }
 

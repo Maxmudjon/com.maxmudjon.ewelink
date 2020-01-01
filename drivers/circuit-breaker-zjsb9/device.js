@@ -44,11 +44,16 @@ class CircuitBreaker extends Homey.Device {
   }
 
   registerStateChangeListener() {
-    Homey.app.ewelinkApi.on(`${this.data.deviceid}`, this.handleStateChange);
+    Homey.app.ewelinkApi.on(this.data.deviceid, this.handleStateChange);
   }
 
   unregisterStateChangeListener() {
-    Homey.app.ewelinkApi.removeListener(`${this.data.deviceid}`, this.handleStateChange);
+    Homey.app.ewelinkApi.removeListener(this.data.deviceid, this.handleStateChange);
+  }
+
+  onDeleted() {
+    this.unregisterStateChangeListener();
+    this.log("Device deleted");
   }
 }
 

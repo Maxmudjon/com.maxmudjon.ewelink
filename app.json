@@ -1,6 +1,6 @@
 {
   "id": "com.maxmudjon.ewelink",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": ">=2.2.0",
   "sdk": 2,
   "name": {
@@ -182,15 +182,15 @@
       ]
     },
     {
-      "id": "sonoff-pow-r2",
+      "id": "sonoff-pow",
       "name": {
-        "en": "Sonoff Pow R2"
+        "en": "Sonoff Pow"
       },
       "class": "socket",
-      "capabilities": ["onoff", "measure_power", "meter_power", "measure_voltage"],
+      "capabilities": ["onoff", "measure_power"],
       "images": {
-        "large": "/drivers/sonoff-pow-r2/assets/images/large.png",
-        "small": "/drivers/sonoff-pow-r2/assets/images/small.png"
+        "large": "/drivers/sonoff-pow/assets/images/large.png",
+        "small": "/drivers/sonoff-pow/assets/images/small.png"
       },
       "pair": [
         {
