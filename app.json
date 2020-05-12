@@ -1,6 +1,6 @@
 {
   "id": "com.maxmudjon.ewelink",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "compatibility": ">=2.2.0",
   "sdk": 2,
   "name": {
@@ -2087,6 +2087,326 @@
             },
             {
               "id": "durationLimit4channel",
+              "type": "number",
+              "label": {
+                "en": "Duration seconds"
+              },
+              "value": 0.5,
+              "min": 0.5,
+              "max": 3600
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sonoff-g1-gsm",
+      "name": {
+        "en": "Sonoff G1 GSM"
+      },
+      "class": "socket",
+      "capabilities": ["onoff"],
+      "images": {
+        "large": "/drivers/sonoff-g1-gsm/assets/images/large.png",
+        "small": "/drivers/sonoff-g1-gsm/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Extra settings"
+          },
+          "children": [
+            {
+              "id": "powerResponse",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Power-on response"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                },
+                {
+                  "id": "stay",
+                  "label": {
+                    "en": "Resume the state before power outage"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "networkLed",
+              "type": "dropdown",
+              "value": "on",
+              "label": {
+                "en": "Network indicator"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "duration",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Duration"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "durationLimit",
+              "type": "number",
+              "label": {
+                "en": "Duration seconds"
+              },
+              "value": 0.5,
+              "min": 0.5,
+              "max": 3600
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sonoff-s20",
+      "name": {
+        "en": "Sonoff S20"
+      },
+      "class": "socket",
+      "capabilities": ["onoff"],
+      "images": {
+        "large": "/drivers/sonoff-s20/assets/images/large.png",
+        "small": "/drivers/sonoff-s20/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Extra settings"
+          },
+          "children": [
+            {
+              "id": "powerResponse",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Power-on response"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                },
+                {
+                  "id": "stay",
+                  "label": {
+                    "en": "Resume the state before power outage"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "networkLed",
+              "type": "dropdown",
+              "value": "on",
+              "label": {
+                "en": "Network indicator"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "duration",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Duration"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "durationLimit",
               "type": "number",
               "label": {
                 "en": "Duration seconds"

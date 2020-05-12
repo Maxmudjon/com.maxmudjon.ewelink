@@ -1,9 +1,9 @@
 "use strict";
 
 const Homey = require("homey");
-const models = ["Sonoff", "BASIC"];
+const models = ["S20"];
 
-class SonoffBasic extends Homey.Driver {
+class SonoffS20 extends Homey.Driver {
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
@@ -42,4 +42,4 @@ class SonoffBasic extends Homey.Driver {
   }
 }
 
-module.exports = SonoffBasic;
+module.exports = SonoffS20;
