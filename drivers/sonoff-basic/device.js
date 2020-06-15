@@ -5,6 +5,7 @@ const Homey = require("homey");
 class SonoffBasic extends Homey.Device {
   onInit() {
     this.log("Sonoff Basic has been inited");
+    this.handleStateChange = this.handleStateChange.bind(this);
     this.driver = this.getDriver();
     this.data = this.getData();
     this.registerStateChangeListener();

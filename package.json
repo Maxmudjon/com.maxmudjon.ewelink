@@ -1,6 +1,6 @@
 {
   "name": "com.maxmudjon.ewelink",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "ewelink",
   "main": "app.js",
   "dependencies": {

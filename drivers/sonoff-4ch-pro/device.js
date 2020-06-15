@@ -7,19 +7,30 @@ class Sonoff4CHPro extends Homey.Device {
     this.log("Sonoff Basic has been inited");
     this.driver = this.getDriver();
     this.data = this.getData();
+    this.handleStateChange = this.handleStateChange.bind(this);
     this.registerStateChangeListener();
     this.registerChannelToggle("onoff");
     this.registerChannelToggle("onoff.1");
     this.registerChannelToggle("onoff.2");
     this.registerChannelToggle("onoff.3");
     this.saving = false;
+    const { actions } = this.driver;
+    this.registerToggleAction("onoff.1", actions.secondChannelOn);
+    this.registerToggleAction("onoff.1", actions.secondChannelOff);
+    this.registerToggleAction("onoff.1", actions.secondChannelToggle);
+    this.registerToggleAction("onoff.2", actions.threeChannelOn);
+    this.registerToggleAction("onoff.2", actions.threeChannelOff);
+    this.registerToggleAction("onoff.2", actions.threeChannelToggle);
+    this.registerToggleAction("onoff.3", actions.fourChannelOn);
+    this.registerToggleAction("onoff.3", actions.fourChannelOff);
+    this.registerToggleAction("onoff.3", actions.fourChannelToggle);
   }
 
   handleStateChange(device) {
-    console.log("TCL: Sonoff4CHPro -> handleStateChange -> device", device);
     if (device.params) {
       if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
       if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
+
       if (device.params.startup && !this.saving)
         this.setSettings({
           powerResponse: device.params.startup
@@ -109,12 +120,42 @@ class Sonoff4CHPro extends Homey.Device {
     });
   }
 
+  registerToggleAction(name, action) {
+    action.registerRunListener(async (args, state) => {
+      let channels = [{ outlet: 0, switch: "on" }, { outlet: 1, switch: "on" }, { outlet: 2, switch: "on" }, { outlet: 3, switch: "on" }];
+      if (name == "onoff") {
+        channels[0].switch = value ? "on" : "off";
+        channels[1].switch = args.device.getCapabilityValue("onoff.1") ? "on" : "off";
+        channels[2].switch = args.device.getCapabilityValue("onoff.2") ? "on" : "off";
+        channels[3].switch = args.device.getCapabilityValue("onoff.3") ? "on" : "off";
+      } else if (name == "onoff.1") {
+        channels[0].switch = args.device.getCapabilityValue("onoff") ? "on" : "off";
+        channels[1].switch = value ? "on" : "off";
+        channels[2].switch = args.device.getCapabilityValue("onoff.2") ? "on" : "off";
+        channels[3].switch = args.device.getCapabilityValue("onoff.3") ? "on" : "off";
+      } else if (name == "onoff.2") {
+        channels[0].switch = args.device.getCapabilityValue("onoff") ? "on" : "off";
+        channels[1].switch = args.device.getCapabilityValue("onoff.1") ? "on" : "off";
+        channels[2].switch = value ? "on" : "off";
+        channels[3].switch = args.device.getCapabilityValue("onoff.3") ? "on" : "off";
+      } else if (name == "onoff.3") {
+        channels[0].switch = args.device.getCapabilityValue("onoff") ? "on" : "off";
+        channels[1].switch = args.device.getCapabilityValue("onoff.1") ? "on" : "off";
+        channels[2].switch = args.device.getCapabilityValue("onoff.2") ? "on" : "off";
+        channels[3].switch = value ? "on" : "off";
+      }
+
+      Homey.app.ewelinkApi.setPower2State(data, channels);
+      return true;
+    });
+  }
+
   registerStateChangeListener() {
-    Homey.app.ewelinkApi.on(this.data.deviceid, event => this.handleStateChange(event));
+    Homey.app.ewelinkApi.on(this.data.deviceid, this.handleStateChange);
   }
 
   unregisterStateChangeListener() {
-    Homey.app.ewelinkApi.removeListener(this.data.deviceid, event => this.handleStateChange(event));
+    Homey.app.ewelinkApi.removeListener(this.data.deviceid, this.handleStateChange);
   }
 
   onDeleted() {

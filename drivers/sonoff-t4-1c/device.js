@@ -7,13 +7,13 @@ class SonoffT41C extends Homey.Device {
     this.log("Sonoff Basic has been inited");
     this.driver = this.getDriver();
     this.data = this.getData();
+    this.handleStateChange = this.handleStateChange.bind(this);
     this.registerStateChangeListener();
     this.registerToggle("onoff");
     this.saving = false;
   }
 
   handleStateChange(device) {
-    console.log("[INFO]: SonoffT41C -> handleStateChange -> device", device);
     if (device.params) {
       if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
       if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
@@ -70,11 +70,11 @@ class SonoffT41C extends Homey.Device {
   }
 
   registerStateChangeListener() {
-    Homey.app.ewelinkApi.on(this.data.deviceid, event => this.handleStateChange(event));
+    Homey.app.ewelinkApi.on(this.data.deviceid, this.handleStateChange);
   }
 
   unregisterStateChangeListener() {
-    Homey.app.ewelinkApi.removeListener(this.data.deviceid, event => this.handleStateChange(event));
+    Homey.app.ewelinkApi.removeListener(this.data.deviceid, this.handleStateChange);
   }
 
   onDeleted() {

@@ -4,6 +4,20 @@ const Homey = require("homey");
 const models = ["4CH Pro"];
 
 class Sonoff4CHPro extends Homey.Driver {
+  onInit() {
+    this.actions = {
+      secondChannelOn: new Homey.FlowCardAction("secondChannelOn").register(),
+      secondChannelOff: new Homey.FlowCardAction("secondChannelOff").register(),
+      secondChannelToggle: new Homey.FlowCardAction("secondChannelToggle").register(),
+      threeChannelOn: new Homey.FlowCardAction("threeChannelOn").register(),
+      threeChannelOff: new Homey.FlowCardAction("threeChannelOff").register(),
+      threeChannelToggle: new Homey.FlowCardAction("threeChannelToggle").register(),
+      fourChannelOn: new Homey.FlowCardAction("fourChannelOn").register(),
+      fourChannelOff: new Homey.FlowCardAction("fourChannelOff").register(),
+      fourChannelToggle: new Homey.FlowCardAction("fourChannelToggle").register()
+    };
+  }
+
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
