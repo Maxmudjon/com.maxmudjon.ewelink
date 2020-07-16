@@ -1,9 +1,15 @@
 "use strict";
 
 const Homey = require("homey");
-const models = ["Sonoff", "BASIC", "Basic", "Basic2"];
+const models = ["2.0-led"];
 
-class SonoffBasic extends Homey.Driver {
+class ABC20LED extends Homey.Driver {
+  onInit() {
+    this.actions = {
+      setRGBMode: new Homey.FlowCardAction("setRGBMode").register()
+    };
+  }
+
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
@@ -31,9 +37,7 @@ class SonoffBasic extends Homey.Driver {
           mac: device.params.staMac,
           fwVersion: device.params.fwVersion,
           powerResponse: device.params.startup,
-          networkLed: device.params.sledOnline,
-          duration: device.params.pulse,
-          durationLimit: parseFloat(device.params.pulseWidth / 1000)
+          networkLed: device.params.sledOnline
         }
       };
       sortDevices.push(deviceList);
@@ -42,4 +46,4 @@ class SonoffBasic extends Homey.Driver {
   }
 }
 
-module.exports = SonoffBasic;
+module.exports = ABC20LED;

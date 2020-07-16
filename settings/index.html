@@ -18,6 +18,39 @@
             </figure>
           </div>
           <div class="card-content columns">
+            <div class="dropdown" id="regionDropdown" style="width: 100%;padding: .75rem">
+              <div class="dropdown-trigger" style="width: 100%">
+                <button
+                  class="button"
+                  aria-haspopup="true"
+                  aria-controls="dropdown-menu"
+                  @click="setClass('regionDropdown','is-active')"
+                  style="width: 100%;border: 1px solid transparent;background-color: #fff;border-color: #dbdbdb;border-width: 1px;color: #363636;cursor: pointer;justify-content: center;padding-bottom: calc(.5em - 1px);padding-left: 1em;padding-right: 1em;padding-top: calc(.5em - 1px); text-align: center; white-space: nowrap;"
+                  id="regionDropdownButton"
+                >
+                  <span>Region</span>
+                  <span class="icon is-small">
+                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                  </span>
+                </button>
+              </div>
+              <div class="dropdown-menu" id="dropdown-menu" role="menu" style="width: 100%">
+                <div class="dropdown-content">
+                  <a @click="setRegion('as')" class="dropdown-item">
+                    Asia
+                  </a>
+                  <a @click="setRegion('eu')" class="dropdown-item">
+                    Europe
+                  </a>
+                  <a @click="setRegion('us')" class="dropdown-item">
+                    USA
+                  </a>
+                  <a @click="setRegion('cn')" class="dropdown-item">
+                    China
+                  </a>
+                </div>
+              </div>
+            </div>
             <div class="column  is-4">
               <input class="input" type="text" placeholder="Phone or email" v-model="login" @change="onEdit" style="FONT-WEIGHT: 600; padding-left: 10px; padding-top: 6px;" />
             </div>
@@ -64,6 +97,7 @@
             return {
               login: null,
               password: null,
+              region: null,
               alert: false,
               page: "login",
               deviceCount: 0,
@@ -74,6 +108,7 @@
           mounted() {
             Homey.get("account", (err, user) => {
               let alert = document.getElementById("alert");
+
               if (err) {
                 alert.innerText = err;
                 this.alert = true;
@@ -86,17 +121,20 @@
               } else {
                 this.login = user.login;
                 this.password = user.password;
+                this.region = user.region;
 
                 Homey.api("POST", "/getDevices", user, (error, result) => {
                   if (result.status == "error") {
                     this.alert = true;
                     alert.innerHTML = result.msg;
-                    return;
+                    this.loading = false;
+                    this.buttonText = "Sign in";
+                  } else {
+                    this.page = "profile";
+                    this.deviceCount = result.devicelist.length;
+                    this.loading = false;
+                    this.buttonText = "Sign in";
                   }
-                  this.page = "profile";
-                  this.deviceCount = result.devicelist.length;
-                  this.loading = false;
-                  this.buttonText = "Sign in";
                 });
               }
             });
@@ -105,10 +143,12 @@
             signin() {
               this.loading = true;
               this.buttonText = "Loading...";
+              this.alert = false;
               let alert = document.getElementById("alert");
               let signData = {
                 login: this.login,
-                password: this.password
+                password: this.password,
+                region: this.region
               };
 
               Homey.api("POST", "/getDevices", signData, (error, result) => {
@@ -144,6 +184,7 @@
               this.page = "login";
               this.deviceCount = 0;
               this.password = null;
+              this.region = null;
               this.loading = false;
               this.buttonText = "Sign in";
 
@@ -155,6 +196,7 @@
                 alert.classList.remove("is-danger");
                 alert.classList.add("is-success");
                 alert.innerText = "logout successfully";
+                this.alert = true;
               });
             },
             onEdit() {
@@ -162,11 +204,28 @@
               this.alert = false;
               alert.classList.remove("is-success");
               alert.classList.add("is-danger");
+            },
+            setRegion(regionCode) {
+              this.region = regionCode;
+              const regions = {
+                as: "Asia",
+                eu: "Europe",
+                us: "USA",
+                cn: "China"
+              };
+
+              document.getElementById("regionDropdownButton").childNodes[0].outerHTML = "<span>" + "Region - " + regions[regionCode] + "</span>";
+              document.getElementById("regionDropdown").classList.remove("is-active");
+              document.getElementById("alert").innerHTML = "";
+              this.alert = false;
+            },
+            setClass(id, _class) {
+              document.getElementById(id).classList.toggle(_class);
             }
           },
           computed: {
             empty() {
-              if (!!this.login && this.login != "" && !!this.password && this.password != "" && !this.loading) {
+              if (!!this.login && this.login != "" && !!this.password && this.password != "" && !!this.region && this.region != "" && !this.loading) {
                 return false;
               } else return true;
             }

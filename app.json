@@ -1,6 +1,6 @@
 {
   "id": "com.maxmudjon.ewelink",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "compatibility": ">=2.2.0",
   "sdk": 2,
   "name": {
@@ -24,7 +24,7 @@
     {
       "id": "sonoff-basic",
       "name": {
-        "en": "Sonoff Basic"
+        "en": "Sonoff Basic / Basic 2"
       },
       "class": "light",
       "capabilities": ["onoff"],
@@ -2418,6 +2418,112 @@
           ]
         }
       ]
+    },
+    {
+      "id": "abc-2.0-led",
+      "name": {
+        "en": "ABC 2.0 LED"
+      },
+      "class": "light",
+      "capabilities": ["onoff", "dim", "light_hue", "RGBEffects"],
+      "images": {
+        "large": "/drivers/abc-2.0-led/assets/images/large.png",
+        "small": "/drivers/abc-2.0-led/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Extra settings"
+          },
+          "children": [
+            {
+              "id": "powerResponse",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Power-on response"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                },
+                {
+                  "id": "stay",
+                  "label": {
+                    "en": "Resume the state before power outage"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ],
   "flow": {
@@ -2538,7 +2644,125 @@
             "filter": "driver_id=sonoff-4ch-pro"
           }
         ]
+      },
+      {
+        "id": "setRGBMode",
+        "title": {
+          "en": "Set RGB mode"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=abc-2.0-led"
+          },
+          {
+            "type": "dropdown",
+            "name": "mode",
+            "values": [
+              {
+                "id": "1",
+                "label": {
+                  "en": "Colorful"
+                }
+              },
+              {
+                "id": "2",
+                "label": {
+                  "en": "Colorful gradient"
+                }
+              },
+              {
+                "id": "3",
+                "label": {
+                  "en": "Colorful breath"
+                }
+              },
+              {
+                "id": "8",
+                "label": {
+                  "en": "RGB gradient"
+                }
+              },
+              {
+                "id": "9",
+                "label": {
+                  "en": "RGB pulse"
+                }
+              },
+              {
+                "id": "10",
+                "label": {
+                  "en": "RGB breath"
+                }
+              },
+              {
+                "id": "11",
+                "label": {
+                  "en": "RGB strobe"
+                }
+              }
+            ]
+          }
+        ]
       }
     ]
+  },
+  "capabilities": {
+    "RGBEffects": {
+      "type": "enum",
+      "title": {
+        "en": "RGB modes"
+      },
+      "desc": {
+        "en": "RGB modes"
+      },
+      "values": [
+        {
+          "id": "1",
+          "title": {
+            "en": "Colorful"
+          }
+        },
+        {
+          "id": "2",
+          "title": {
+            "en": "Colorful gradient"
+          }
+        },
+        {
+          "id": "3",
+          "title": {
+            "en": "Colorful breath"
+          }
+        },
+        {
+          "id": "8",
+          "title": {
+            "en": "RGB gradient"
+          }
+        },
+        {
+          "id": "9",
+          "title": {
+            "en": "RGB pulse"
+          }
+        },
+        {
+          "id": "10",
+          "title": {
+            "en": "RGB breath"
+          }
+        },
+        {
+          "id": "11",
+          "title": {
+            "en": "RGB strobe"
+          }
+        }
+      ],
+      "getable": true,
+      "setable": true
+    }
   }
 }
