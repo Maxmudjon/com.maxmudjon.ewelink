@@ -1,6 +1,6 @@
 {
   "id": "com.maxmudjon.ewelink",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "compatibility": ">=2.2.0",
   "sdk": 2,
   "name": {
@@ -2429,6 +2429,112 @@
       "images": {
         "large": "/drivers/abc-2.0-led/assets/images/large.png",
         "small": "/drivers/abc-2.0-led/assets/images/small.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            },
+            {
+              "id": "fwVersion",
+              "type": "label",
+              "label": {
+                "en": "Firmware version"
+              },
+              "value": "fw_version"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Extra settings"
+          },
+          "children": [
+            {
+              "id": "powerResponse",
+              "type": "dropdown",
+              "value": "off",
+              "label": {
+                "en": "Power-on response"
+              },
+              "values": [
+                {
+                  "id": "on",
+                  "label": {
+                    "en": "On"
+                  }
+                },
+                {
+                  "id": "off",
+                  "label": {
+                    "en": "Off"
+                  }
+                },
+                {
+                  "id": "stay",
+                  "label": {
+                    "en": "Resume the state before power outage"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generic",
+      "name": {
+        "en": "Generic devices"
+      },
+      "class": "socket",
+      "capabilities": ["onoff"],
+      "images": {
+        "large": "/drivers/generic/assets/images/large.png",
+        "small": "/drivers/generic/assets/images/small.png"
       },
       "pair": [
         {
