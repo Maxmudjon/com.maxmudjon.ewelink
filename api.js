@@ -7,13 +7,14 @@ module.exports = [
     path: "/getDevices",
     fn: async (args, callback) => {
       await Homey.app
-        .getDevices(args)
-        .then(res => {
+        .sign(args)
+        .then((res) => {
+          console.log("res api", res);
           callback(null, res);
         })
-        .catch(error => {
+        .catch((error) => {
           callback(error, null);
         });
-    }
-  }
+    },
+  },
 ];

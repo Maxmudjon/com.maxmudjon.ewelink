@@ -16,12 +16,16 @@ class Ewelink extends Homey.App {
   onSettingsChanged(key) {
     switch (key) {
       case "account":
-        this.ewelinkApi.destroy();
+        this.ewelinkApi.eWeLinkShutdown();
         this.ewelinkApi.connect();
         break;
       default:
         break;
     }
+  }
+
+  sign(signData) {
+    return Homey.app.ewelinkApi.sign(signData);
   }
 
   getDevices(signData) {

@@ -17,36 +17,33 @@ class SonoffMini extends Homey.Device {
   }
 
   handleStateChange(device) {
-    clearInterval(this.interval);
-    this.interval = setInterval(() => {
-      Homey.app.ewelinkApi
-        .getDevices("MINI")
-        .then(device => {
-          let someDevice = device.filter(device => device.deviceid === this.data.deviceid);
-          if (someDevice[0].online) {
-            this.setAvailable();
-            this.setSettings({
-              brandName: someDevice[0].brandName,
-              model: someDevice[0].productModel,
-              ip: someDevice[0].ip,
-              fwVersion: someDevice[0].fwVersion
-            }).catch(error => this.log(error));
-          } else {
-            this.setUnavailable(Homey.__("Device offline"));
-          }
-        })
-        .catch(error => this.log(error));
-    }, 60 * 60 * 1000);
     if (device.params) {
+      device.params.online ? this.setAvailable() : this.setUnavailable();
+
       if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
       if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
-      if (device.brandName)
+      if (device.params.updateSource == "LAN") this.setStoreValue("api", "lan");
+      if (device.params.updateSource == "WS") this.setStoreValue("api", "ws");
+
+      if (device.params.startup)
         this.setSettings({
-          brandName: device.brandName,
-          model: device.productModel,
-          ip: device.ip,
-          fwVersion: device.params.fwVersion
-        }).catch(error => this.log(error));
+          powerResponse: device.params.startup,
+        });
+
+      if (device.params.sledOnline)
+        this.setSettings({
+          networkLed: device.params.sledOnline,
+        });
+
+      if (device.params.pulse)
+        this.setSettings({
+          duration: device.params.pulse,
+        });
+
+      if (device.params.pulseWidth)
+        this.setSettings({
+          durationLimit: parseFloat(device.params.pulseWidth / 1000),
+        });
     }
   }
 
@@ -56,7 +53,7 @@ class SonoffMini extends Homey.Device {
         .then(() => {
           this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability successfully updated");
         })
-        .catch(error => {
+        .catch((error) => {
           this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability not updated because there are errors: " + error.message);
         });
     }
@@ -64,11 +61,15 @@ class SonoffMini extends Homey.Device {
 
   registerToggle(name) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setPowerState(data, value);
+
+    this.registerCapabilityListener(name, async (value) => {
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: value ? "on" : "off" });
     });
   }
 

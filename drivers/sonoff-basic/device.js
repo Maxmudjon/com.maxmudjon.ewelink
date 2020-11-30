@@ -15,57 +15,75 @@ class SonoffBasic extends Homey.Device {
 
   handleStateChange(device) {
     if (device.params) {
+      device.params.online ? this.setAvailable() : this.setUnavailable();
+
       if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
       if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
-      if (device.params.startup && !this.saving)
+      if (device.params.updateSource == "LAN") this.setStoreValue("api", "lan");
+      if (device.params.updateSource == "WS") this.setStoreValue("api", "ws");
+
+      if (device.params.startup)
         this.setSettings({
-          powerResponse: device.params.startup
+          powerResponse: device.params.startup,
         });
-      if (device.params.sledOnline && !this.saving)
+
+      if (device.params.sledOnline)
         this.setSettings({
-          networkLed: device.params.sledOnline
+          networkLed: device.params.sledOnline,
         });
-      if (device.params.pulse && !this.saving)
+
+      if (device.params.pulse)
         this.setSettings({
-          duration: device.params.pulse
+          duration: device.params.pulse,
         });
-      if (device.params.pulseWidth && !this.saving)
+
+      if (device.params.pulseWidth)
         this.setSettings({
-          durationLimit: parseFloat(device.params.pulseWidth / 1000)
+          durationLimit: parseFloat(device.params.pulseWidth / 1000),
         });
     }
   }
 
   async onSettings(oldSettingsObj, newSettingsObj, changedKeysArr, callback) {
-    this.saving = true;
-    let params = {
+    let data = {
+      name: this.getName(),
+      deviceid: this.data.deviceid,
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
+    };
+
+    Homey.app.ewelinkApi.sendDeviceUpdate(data, {
       startup: newSettingsObj.powerResponse,
       sledOnline: newSettingsObj.networkLed,
       pulse: newSettingsObj.duration,
-      pulseWidth: newSettingsObj.durationLimit * 1000
-    };
-
-    let data = {
-      deviceid: this.data.deviceid,
-      apikey: this.data.apikey
-    };
-
-    Homey.app.ewelinkApi.setParams(data, params).then(() => callback(null, true));
+      pulseWidth: newSettingsObj.durationLimit * 1000,
+    });
   }
 
   updateCapabilityValue(name, value, trigger) {
     if (this.getCapabilityValue(name) != value) {
-      this.setCapabilityValue(name, value);
+      this.setCapabilityValue(name, value)
+        .then(() => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability successfully updated");
+        })
+        .catch((error) => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability not updated because there are errors: " + error.message);
+        });
     }
   }
 
   registerToggle(name, trigger) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setPowerState(data, value);
+
+    this.registerCapabilityListener(name, async (value) => {
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: value ? "on" : "off" });
     });
   }
 

@@ -19,27 +19,59 @@ class CircuitBreaker extends Homey.Device {
   }
 
   handleStateChange(device) {
-    console.log("[INFO]: CircuitBreaker -> handleStateChange -> device", device);
     if (device.params) {
-      device.params.switch == "on" ? this.updateCapabilityValue("onoff", true) : this.updateCapabilityValue("onoff", false);
+      device.params.online ? this.setAvailable() : this.setUnavailable();
+
+      if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
+      if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
+      if (device.params.updateSource == "LAN") this.setStoreValue("api", "lan");
+      if (device.params.updateSource == "WS") this.setStoreValue("api", "ws");
+
+      if (device.params.startup)
+        this.setSettings({
+          powerResponse: device.params.startup,
+        });
+
+      if (device.params.sledOnline)
+        this.setSettings({
+          networkLed: device.params.sledOnline,
+        });
+
+      if (device.params.pulse)
+        this.setSettings({
+          duration: device.params.pulse,
+        });
+
+      if (device.params.pulseWidth)
+        this.setSettings({
+          durationLimit: parseFloat(device.params.pulseWidth / 1000),
+        });
     }
   }
 
   updateCapabilityValue(name, value, trigger) {
     if (this.getCapabilityValue(name) != value) {
-      this.setCapabilityValue(name, value);
+      this.setCapabilityValue(name, value)
+        .then(() => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability successfully updated");
+        })
+        .catch((error) => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability not updated because there are errors: " + error.message);
+        });
     }
   }
 
   registerToggle(name, trigger) {
-    console.log("[INFO]: CircuitBreaker -> registerToggle -> this.data.apiKey", this.data.apikey);
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setPowerState(data, value);
-      console.log("[INFO]: CircuitBreaker -> registerToggle -> data", data);
+
+    this.registerCapabilityListener(name, async (value) => {
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: value ? "on" : "off" });
     });
   }
 

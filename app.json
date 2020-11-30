@@ -1,6 +1,6 @@
 {
   "id": "com.maxmudjon.ewelink",
-  "version": "1.0.7",
+  "version": "1.1.5",
   "compatibility": ">=2.2.0",
   "sdk": 2,
   "name": {
@@ -2262,7 +2262,7 @@
     {
       "id": "sonoff-s20",
       "name": {
-        "en": "Sonoff S20"
+        "en": "Sonoff S20 / S26 (R1)"
       },
       "class": "socket",
       "capabilities": ["onoff"],
@@ -2630,9 +2630,245 @@
           ]
         }
       ]
+    },
+    {
+      "id": "zigbee_temperature_humidity_sensor",
+      "name": {
+        "en": "Temperature Humidity sensor"
+      },
+      "class": "socket",
+      "capabilities": ["measure_temperature", "measure_humidity", "measure_battery", "alarm_battery"],
+      "images": {
+        "large": "/drivers/zigbee_temperature_humidity_sensor/assets/images/large.png",
+        "small": "/drivers/zigbee_temperature_humidity_sensor/assets/images/small.png"
+      },
+      "energy": {
+        "batteries": ["CR2450"]
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zigbee_switch",
+      "name": {
+        "en": "Switch"
+      },
+      "class": "socket",
+      "capabilities": ["measure_battery", "alarm_battery"],
+      "images": {
+        "large": "/drivers/zigbee_switch/assets/images/large.png",
+        "small": "/drivers/zigbee_switch/assets/images/small.png"
+      },
+      "energy": {
+        "batteries": ["CR2450"]
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zigbee_motion_sensor",
+      "name": {
+        "en": "Motion sensor"
+      },
+      "class": "socket",
+      "capabilities": ["alarm_motion", "measure_battery", "alarm_battery"],
+      "images": {
+        "large": "/drivers/zigbee_motion_sensor/assets/images/large.png",
+        "small": "/drivers/zigbee_motion_sensor/assets/images/small.png"
+      },
+      "energy": {
+        "batteries": ["CR2450"]
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          },
+          "options": {
+            "singular": false
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Device information"
+          },
+          "children": [
+            {
+              "id": "brandName",
+              "type": "label",
+              "label": {
+                "en": "Brand name"
+              },
+              "value": "brand_name"
+            },
+            {
+              "id": "model",
+              "type": "label",
+              "label": {
+                "en": "Model"
+              },
+              "value": "model_name"
+            },
+            {
+              "id": "ip",
+              "type": "label",
+              "label": {
+                "en": "IP"
+              },
+              "value": "ip_address"
+            }
+          ]
+        }
+      ]
     }
   ],
   "flow": {
+    "triggers": [
+      {
+        "id": "click_switch",
+        "title": {
+          "en": "Single click switch"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=zigbee_switch"
+          }
+        ]
+      },
+      {
+        "id": "double_click_switch",
+        "title": {
+          "en": "Double click switch"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=zigbee_switch"
+          }
+        ]
+      },
+      {
+        "id": "long_press_switch",
+        "title": {
+          "en": "Long press switch"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=zigbee_switch"
+          }
+        ]
+      }
+    ],
     "actions": [
       {
         "id": "secondChannelOn",

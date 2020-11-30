@@ -1,7 +1,7 @@
 "use strict";
 
 const Homey = require("homey");
-const models = ["4CH Pro"];
+const models = ["4CH Pro", "4CHPROR2"];
 
 class Sonoff4CHPro extends Homey.Driver {
   onInit() {
@@ -14,17 +14,17 @@ class Sonoff4CHPro extends Homey.Driver {
       threeChannelToggle: new Homey.FlowCardAction("threeChannelToggle").register(),
       fourChannelOn: new Homey.FlowCardAction("fourChannelOn").register(),
       fourChannelOff: new Homey.FlowCardAction("fourChannelOff").register(),
-      fourChannelToggle: new Homey.FlowCardAction("fourChannelToggle").register()
+      fourChannelToggle: new Homey.FlowCardAction("fourChannelToggle").register(),
     };
   }
 
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
-      .then(devices => {
-        callback(null, this.deviceList(devices.devicelist.filter(device => models.includes(device.productModel))));
+      .then((devices) => {
+        callback(null, this.deviceList(devices.filter((device) => models.includes(device.productModel))));
       })
-      .catch(error => callback(new Error(error)));
+      .catch((error) => callback(new Error(error)));
   }
 
   deviceList(devices) {
@@ -36,12 +36,12 @@ class Sonoff4CHPro extends Homey.Driver {
         data: {
           deviceid: device.deviceid,
           apikey: device.apikey,
-          extra: device.extra.extra
+          uiid: device.extra.uiid,
         },
         settings: {
           brandName: device.brandName,
           model: device.productModel,
-          ip: device.ip,
+
           mac: device.params.staMac,
           fwVersion: device.params.fwVersion,
           powerResponse: device.params.startup,
@@ -53,8 +53,8 @@ class Sonoff4CHPro extends Homey.Driver {
           duration3channel: device.params.pulses[2].pulse,
           durationLimit3channel: parseFloat(device.params.pulses[2].width / 1000),
           duration4channel: device.params.pulses[3].pulse,
-          durationLimit4channel: parseFloat(device.params.pulses[3].width / 1000)
-        }
+          durationLimit4channel: parseFloat(device.params.pulses[3].width / 1000),
+        },
       };
       sortDevices.push(deviceList);
     }

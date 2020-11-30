@@ -18,16 +18,19 @@ class SonoffTH16 extends Homey.Device {
   }
 
   handleStateChange(device) {
-    console.log("[INFO]: SonoffTH16 -> handleStateChange -> device", device);
-
     if (device.params) {
+      device.params.online ? this.setAvailable() : this.setUnavailable();
+
       if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
       if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
       if (device.params.currentTemperature) this.updateCapabilityValue("measure_temperature", parseInt(device.params.currentTemperature));
       if (device.params.currentHumidity) this.updateCapabilityValue("measure_humidity", parseInt(device.params.currentHumidity));
+      if (device.params.updateSource == "LAN") this.setStoreValue("api", "lan");
+      if (device.params.updateSource == "WS") this.setStoreValue("api", "ws");
+
       if (device.params.sensorType)
         this.setSettings({
-          sensorType: device.params.sensorType
+          sensorType: device.params.sensorType,
         });
 
       if (device.params.deviceType == "temperature") {
@@ -36,7 +39,7 @@ class SonoffTH16 extends Homey.Device {
           targetHighTemperature: parseInt(device.params.targets[0].targetHigh),
           highTemperatureThreshold: device.params.targets[0].reaction.switch,
           targetLowTemperature: parseInt(device.params.targets[1].targetLow),
-          lowTemperatureThreshold: device.params.targets[1].reaction.switch
+          lowTemperatureThreshold: device.params.targets[1].reaction.switch,
         });
       } else if (device.params.deviceType == "humidity") {
         this.setSettings({
@@ -44,51 +47,83 @@ class SonoffTH16 extends Homey.Device {
           targetHighHumidity: device.params.targets[0].targetHigh,
           highTemperatureThreshold: parseInt(device.params.targets[0].reaction.switch),
           targetLowHumidity: parseInt(device.params.targets[1].targetLow),
-          lowHumidityThreshold: device.params.targets[1].reaction.switch
+          lowHumidityThreshold: device.params.targets[1].reaction.switch,
         });
       } else if (device.params.deviceType == "normal") {
         this.setSettings({
-          thermostatMode: "off"
+          thermostatMode: "off",
         });
       }
+
+      if (device.params.startup)
+        this.setSettings({
+          powerResponse: device.params.startup,
+        });
+
+      if (device.params.sledOnline)
+        this.setSettings({
+          networkLed: device.params.sledOnline,
+        });
+
+      if (device.params.pulse)
+        this.setSettings({
+          duration: device.params.pulse,
+        });
+
+      if (device.params.pulseWidth)
+        this.setSettings({
+          durationLimit: parseFloat(device.params.pulseWidth / 1000),
+        });
     }
   }
 
   async onSettings(oldSettingsObj, newSettingsObj, changedKeysArr, callback) {
+    let data = {
+      name: this.getName(),
+      deviceid: this.data.deviceid,
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
+    };
     if (changedKeysArr) {
       if (changedKeysArr.includes("thermostatMode")) {
         this.log("Thermostat mode changed to: ", newSettingsObj.thermostatMode);
-        let data = {
-          deviceid: this.data.deviceid,
-          apikey: this.data.apikey
-        };
-        Homey.app.ewelinkApi.setParams(data, { deviceType: newSettingsObj.thermostatMode });
+
+        Homey.app.ewelinkApi.sendDeviceUpdate(data, { deviceType: newSettingsObj.thermostatMode });
       }
 
       if (changedKeysArr.includes("targetHighTemperature")) {
         this.log("Thermostat mode changed to: ", newSettingsObj.targetHighTemperature);
-        let data = {
-          deviceid: this.data.deviceid,
-          apikey: this.data.apikey
-        };
-        Homey.app.ewelinkApi.setParams(data, { deviceType: newSettingsObj.thermostatMode });
+
+        Homey.app.ewelinkApi.sendDeviceUpdate(data, { deviceType: newSettingsObj.thermostatMode });
       }
     }
   }
 
   updateCapabilityValue(name, value, trigger) {
     if (this.getCapabilityValue(name) != value) {
-      this.setCapabilityValue(name, value);
+      this.setCapabilityValue(name, value)
+        .then(() => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability successfully updated");
+        })
+        .catch((error) => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability not updated because there are errors: " + error.message);
+        });
+    }
     }
   }
 
   registerToggle(name, trigger) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setPowerState(data, value);
+
+    this.registerCapabilityListener(name, async (value) => {
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: value ? "on" : "off" });
     });
   }
 

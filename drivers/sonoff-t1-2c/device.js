@@ -19,40 +19,74 @@ class SonoffT12C extends Homey.Device {
   }
 
   handleStateChange(device) {
-    if (device.params && device.params.switches) {
+    if (device.params) {
+      device.params.online ? this.setAvailable() : this.setUnavailable();
+
       if (device.params.switches[0].switch == "on") this.updateCapabilityValue("onoff", true);
-      else if (device.params.switches[0].switch == "off") this.updateCapabilityValue("onoff", false);
+      if (device.params.switches[0].switch == "off") this.updateCapabilityValue("onoff", false);
       if (device.params.switches[1].switch == "on") this.updateCapabilityValue("onoff.1", true);
-      else if (device.params.switches[1].switch == "off") this.updateCapabilityValue("onoff", false);
+      if (device.params.switches[1].switch == "off") this.updateCapabilityValue("onoff.1", false);
+      if (device.params.updateSource == "LAN") this.setStoreValue("api", "lan");
+      if (device.params.updateSource == "WS") this.setStoreValue("api", "ws");
+
+      if (device.params.startup)
+        this.setSettings({
+          powerResponse: device.params.startup,
+        });
+
+      if (device.params.sledOnline)
+        this.setSettings({
+          networkLed: device.params.sledOnline,
+        });
+
+      if (device.params.pulse)
+        this.setSettings({
+          duration: device.params.pulse,
+        });
+
+      if (device.params.pulseWidth)
+        this.setSettings({
+          durationLimit: parseFloat(device.params.pulseWidth / 1000),
+        });
     }
   }
 
   updateCapabilityValue(name, value, trigger) {
     if (this.getCapabilityValue(name) != value) {
-      this.setCapabilityValue(name, value);
+      this.setCapabilityValue(name, value)
+        .then(() => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability successfully updated");
+        })
+        .catch((error) => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability not updated because there are errors: " + error.message);
+        });
     }
   }
 
   registerToggle(name, trigger) {
-    console.log("[INFO]: SonoffT12C -> registerToggle -> this.data.apiKey", this.data.apikey);
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      let channels = [{ outlet: 0, switch: "on" }, { outlet: 1, switch: "on" }, { outlet: 2, switch: "on" }, { outlet: 3, switch: "on" }];
+    this.registerCapabilityListener(name, async (value) => {
+      let channels = [
+        { outlet: 0, switch: "on" },
+        { outlet: 1, switch: "on" },
+        { outlet: 2, switch: "on" },
+        { outlet: 3, switch: "on" },
+      ];
       if (name == "onoff") {
         channels[0].switch = value ? "on" : "off";
         channels[1].switch = this.getCapabilityValue("onoff.1") ? "on" : "off";
       } else if (name == "onoff.1") {
-        channels[1].switch = value ? "on" : "off";
         channels[0].switch = this.getCapabilityValue("onoff") ? "on" : "off";
+        channels[1].switch = value ? "on" : "off";
       }
 
-      Homey.app.ewelinkApi.setPower2State(data, channels);
-      console.log("[INFO]: SonoffT12C -> registerToggle -> data" + data + " CAPAB " + name);
-
-      // this.triggerFlow(trigger, name, value);
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, channels);
     });
   }
 

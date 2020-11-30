@@ -26,29 +26,11 @@ class ABC20LED extends Homey.Device {
   }
 
   handleStateChange(device) {
-    clearInterval(this.interval);
-    this.interval = setInterval(() => {
-      Homey.app.ewelinkApi
-        .getDevices("2.0-led")
-        .then(device => {
-          let someDevice = device.filter(device => device.deviceid === this.data.deviceid);
-          if (someDevice[0].online) {
-            this.setAvailable();
-            this.setSettings({
-              brandName: someDevice[0].brandName,
-              model: someDevice[0].productModel,
-              ip: someDevice[0].ip,
-              fwVersion: someDevice[0].fwVersion
-            }).catch(error => this.log(error));
-          } else {
-            this.setUnavailable(Homey.__("Device offline"));
-          }
-        })
-        .catch(error => this.log(error));
-    }, 60 * 60 * 1000);
     if (device.params) {
       if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
       if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
+      if (device.params.updateSource == "LAN") this.setStoreValue("api", "lan");
+      if (device.params.updateSource == "WS") this.setStoreValue("api", "ws");
       if (device.params.bright) this.updateCapabilityValue("dim", device.params.bright / 100);
       if (device.params.colorR && device.params.colorG && device.params.colorB) {
         let hsbc = this.rgb2hsb([device.params.colorR, device.params.colorG, device.params.colorB]);
@@ -58,13 +40,25 @@ class ABC20LED extends Homey.Device {
       }
       if (device.params.mode) this.updateCapabilityValue("RGBEffects", device.params.mode.toString());
 
-      if (device.brandName)
+      if (device.params.startup)
         this.setSettings({
-          brandName: device.brandName,
-          model: device.productModel,
-          ip: device.ip,
-          fwVersion: device.params.fwVersion
-        }).catch(error => this.log(error));
+          powerResponse: device.params.startup,
+        });
+
+      if (device.params.sledOnline)
+        this.setSettings({
+          networkLed: device.params.sledOnline,
+        });
+
+      if (device.params.pulse)
+        this.setSettings({
+          duration: device.params.pulse,
+        });
+
+      if (device.params.pulseWidth)
+        this.setSettings({
+          durationLimit: parseFloat(device.params.pulseWidth / 1000),
+        });
     }
   }
 
@@ -99,7 +93,7 @@ class ABC20LED extends Homey.Device {
         .then(() => {
           this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability successfully updated");
         })
-        .catch(error => {
+        .catch((error) => {
           this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability not updated because there are errors: " + error.message);
         });
     }
@@ -107,42 +101,58 @@ class ABC20LED extends Homey.Device {
 
   registerToggle(name) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setPowerState(data, value);
+
+    this.registerCapabilityListener(name, async (value) => {
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: value ? "on" : "off" });
     });
   }
 
   registerDim(name) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setBrightness(data, value * 100);
+
+    this.registerCapabilityListener(name, async (value) => {
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { bright: value * 100 });
     });
   }
 
   registerLightHue(name) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
+
+    this.registerCapabilityListener(name, async (value) => {
       const rgb = this.hsb2rgb([value * 359, 1, 1]);
-      Homey.app.ewelinkApi.setRGB(data, { switch: "on", mode: 1, colorR: rgb[0], colorG: rgb[1], colorB: rgb[2], mode: 1, light_type: 1 });
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: "on", mode: 1, colorR: rgb[0], colorG: rgb[1], colorB: rgb[2], mode: 1, light_type: 1 });
     });
   }
 
   registerRGBEffects(name) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      Homey.app.ewelinkApi.setRGBModes(data, { switch: "on", mode: value });
+
+    this.registerCapabilityListener(name, async (value) => {
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: "on", mode: value });
     });
   }
 
@@ -162,12 +172,15 @@ class ABC20LED extends Homey.Device {
 
   registerSetRGBMode(name, action) {
     action.registerRunListener(async (args, state) => {
-      const data = {
+      let data = {
+        name: this.getName(),
         deviceid: args.device.data.deviceid,
-        apikey: args.device.data.apikey
+        apikey: args.device.data.apikey,
+        uiid: this.data.uiid,
+        api: "ws",
       };
-      console.log(args.mode);
-      Homey.app.ewelinkApi.setRGBModes(data, { switch: "on", mode: parseInt(args.mode) });
+
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switch: "on", mode: parseInt(args.mode) });
     });
   }
 

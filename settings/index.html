@@ -5,84 +5,57 @@
     <script src="../assets/vue.min.js"></script>
     <link rel="stylesheet" href="../assets/bulma.min.css" />
   </head>
-  <body style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);">
-    <div id="ewelink" style="padding: 10px;">
+  <body style="background: linear-gradient(135deg, #5541d6 0%, #3f94ff 100%)">
+    <div id="ewelink" style="padding: 10px">
       <div class="container">
-        <div v-show="alert" id="alert" class="notification is-danger" style="margin-bottom: 10px;">
-          Alert
-        </div>
-        <div v-if="page == 'login'" class="card equal-height" style="border-radius: 5px;">
+        <div v-show="alert" id="alert" class="notification is-danger" style="margin-bottom: 10px">Alert</div>
+        <div v-if="page == 'login'" class="card equal-height" style="border-radius: 5px">
           <div class="card-content is-flex is-horizontal-center">
             <figure class="image is-64x64">
               <img src="../assets/logo.png" />
             </figure>
           </div>
           <div class="card-content columns">
-            <div class="dropdown" id="regionDropdown" style="width: 100%;padding: .75rem">
-              <div class="dropdown-trigger" style="width: 100%">
-                <button
-                  class="button"
-                  aria-haspopup="true"
-                  aria-controls="dropdown-menu"
-                  @click="setClass('regionDropdown','is-active')"
-                  style="width: 100%;border: 1px solid transparent;background-color: #fff;border-color: #dbdbdb;border-width: 1px;color: #363636;cursor: pointer;justify-content: center;padding-bottom: calc(.5em - 1px);padding-left: 1em;padding-right: 1em;padding-top: calc(.5em - 1px); text-align: center; white-space: nowrap;"
-                  id="regionDropdownButton"
-                >
-                  <span>Region</span>
-                  <span class="icon is-small">
-                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                  </span>
-                </button>
-              </div>
-              <div class="dropdown-menu" id="dropdown-menu" role="menu" style="width: 100%">
-                <div class="dropdown-content">
-                  <a @click="setRegion('as')" class="dropdown-item">
-                    Asia
-                  </a>
-                  <a @click="setRegion('eu')" class="dropdown-item">
-                    Europe
-                  </a>
-                  <a @click="setRegion('us')" class="dropdown-item">
-                    USA
-                  </a>
-                  <a @click="setRegion('cn')" class="dropdown-item">
-                    China
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="column  is-4">
-              <input class="input" type="text" placeholder="Phone or email" v-model="login" @change="onEdit" style="FONT-WEIGHT: 600; padding-left: 10px; padding-top: 6px;" />
+            <div class="column is-4">
+              <input
+                class="input"
+                type="text"
+                placeholder="Country code (eg 7 for RU, 998 for UZ)"
+                v-model="countryCode"
+                @change="onEdit"
+                style="font-weight: 600; padding-left: 10px; padding-top: 6px"
+              />
             </div>
             <div class="column is-4">
-              <input class="input" type="password" placeholder="Password" v-model="password" @change="onEdit" style="FONT-WEIGHT: 600; padding-left: 10px; padding-top: 6px;" />
+              <input class="input" type="text" placeholder="Phone or email" v-model="login" @change="onEdit" style="font-weight: 600; padding-left: 10px; padding-top: 6px" />
             </div>
             <div class="column is-4">
-              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);" class="button is-primary is-fullwidth" @click="signin" :disabled="empty">
+              <input class="input" type="password" placeholder="Password" v-model="password" @change="onEdit" style="font-weight: 600; padding-left: 10px; padding-top: 6px" />
+            </div>
+            <div class="column is-4">
+              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%, #3f94ff 100%)" class="button is-primary is-fullwidth" @click="signin" :disabled="empty">
                 {{ buttonText }}
               </button>
             </div>
           </div>
         </div>
-        <div v-if="page == 'profile'" class="card equal-height" style="border-radius: 5px;">
+        <div v-if="page == 'profile'" class="card equal-height" style="border-radius: 5px">
           <div class="card-content is-flex is-horizontal-center">
             <figure class="image is-64x64">
               <img src="../assets/logo.png" />
             </figure>
           </div>
           <div class="card-content columns">
-            <div class="column  is-4">
+            <div class="column is-4">
               <label class="label">Hello</label>
               <input class="input is-static" type="text" :value="login" readonly />
             </div>
-            <div class="column  is-4">
+            <div class="column is-4">
               <label class="label">Connected devices</label>
               <input class="input is-static" type="number" :value="deviceCount" readonly />
             </div>
             <div class="column is-4">
-              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%,#3f94ff 100%);" class="button is-primary is-fullwidth" @click="logout">
-                Logout
-              </button>
+              <button type="button" style="background: linear-gradient(135deg, #5541d6 0%, #3f94ff 100%)" class="button is-primary is-fullwidth" @click="logout">Logout</button>
             </div>
           </div>
         </div>
@@ -97,12 +70,12 @@
             return {
               login: null,
               password: null,
-              region: null,
+              countryCode: null,
               alert: false,
               page: "login",
               deviceCount: 0,
               buttonText: "Loading...",
-              loading: true
+              loading: true,
             };
           },
           mounted() {
@@ -115,13 +88,13 @@
                 return Homey.alert(err);
               }
 
-              if (user == null) {
+              if (user == null || !user.countryCode) {
                 this.loading = false;
                 this.buttonText = "Sign in";
               } else {
                 this.login = user.login;
                 this.password = user.password;
-                this.region = user.region;
+                this.countryCode = user.countryCode;
 
                 Homey.api("POST", "/getDevices", user, (error, result) => {
                   if (result.status == "error") {
@@ -131,7 +104,7 @@
                     this.buttonText = "Sign in";
                   } else {
                     this.page = "profile";
-                    this.deviceCount = result.devicelist.length;
+                    this.deviceCount = result.deviceList.length;
                     this.loading = false;
                     this.buttonText = "Sign in";
                   }
@@ -148,7 +121,7 @@
               let signData = {
                 login: this.login,
                 password: this.password,
-                region: this.region
+                countryCode: this.countryCode,
               };
 
               Homey.api("POST", "/getDevices", signData, (error, result) => {
@@ -164,9 +137,9 @@
                 }
 
                 this.page = "profile";
-                this.deviceCount = result.devicelist.length;
+                this.deviceCount = result.deviceList.length;
 
-                Homey.set("account", signData, error => {
+                Homey.set("account", signData, (error) => {
                   if (error) {
                     alert.innerText = error;
                     return Homey.alert(error);
@@ -184,14 +157,13 @@
               this.page = "login";
               this.deviceCount = 0;
               this.password = null;
-              this.region = null;
+              this.countryCode = null;
               this.loading = false;
               this.buttonText = "Sign in";
 
-              Homey.unset("account", err => {
+              Homey.unset("account", (err) => {
                 if (err) {
                   alert.innerText = err;
-                  // return Homey.alert(err);
                 }
                 alert.classList.remove("is-danger");
                 alert.classList.add("is-success");
@@ -205,31 +177,17 @@
               alert.classList.remove("is-success");
               alert.classList.add("is-danger");
             },
-            setRegion(regionCode) {
-              this.region = regionCode;
-              const regions = {
-                as: "Asia",
-                eu: "Europe",
-                us: "USA",
-                cn: "China"
-              };
-
-              document.getElementById("regionDropdownButton").childNodes[0].outerHTML = "<span>" + "Region - " + regions[regionCode] + "</span>";
-              document.getElementById("regionDropdown").classList.remove("is-active");
-              document.getElementById("alert").innerHTML = "";
-              this.alert = false;
-            },
             setClass(id, _class) {
               document.getElementById(id).classList.toggle(_class);
-            }
+            },
           },
           computed: {
             empty() {
-              if (!!this.login && this.login != "" && !!this.password && this.password != "" && !!this.region && this.region != "" && !this.loading) {
+              if (!!this.login && this.login != "" && !!this.password && this.password != "" && !!this.countryCode && this.countryCode != "" && !this.loading) {
                 return false;
               } else return true;
-            }
-          }
+            },
+          },
         });
       }
     </script>

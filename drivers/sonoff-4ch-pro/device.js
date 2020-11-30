@@ -7,14 +7,13 @@ class Sonoff4CHPro extends Homey.Device {
     this.log("Sonoff Basic has been inited");
     this.driver = this.getDriver();
     this.data = this.getData();
+    const { actions } = this.driver;
     this.handleStateChange = this.handleStateChange.bind(this);
     this.registerStateChangeListener();
     this.registerChannelToggle("onoff");
     this.registerChannelToggle("onoff.1");
     this.registerChannelToggle("onoff.2");
     this.registerChannelToggle("onoff.3");
-    this.saving = false;
-    const { actions } = this.driver;
     this.registerToggleAction("onoff.1", actions.secondChannelOn);
     this.registerToggleAction("onoff.1", actions.secondChannelOff);
     this.registerToggleAction("onoff.1", actions.secondChannelToggle);
@@ -27,125 +26,144 @@ class Sonoff4CHPro extends Homey.Device {
   }
 
   handleStateChange(device) {
-    if (device.params) {
-      if (device.params.switch == "on") this.updateCapabilityValue("onoff", true);
-      if (device.params.switch == "off") this.updateCapabilityValue("onoff", false);
+    if (device.params && device.params.online == true) this.setAvailable();
+    if (device.params && device.params.online == false) this.setUnavailable();
 
-      if (device.params.startup && !this.saving)
-        this.setSettings({
-          powerResponse: device.params.startup
-        });
-      if (device.params.sledOnline && !this.saving)
-        this.setSettings({
-          networkLed: device.params.sledOnline
-        });
-      if (device.params.pulse && !this.saving)
-        this.setSettings({
-          duration: device.params.pulse
-        });
-      if (device.params.pulseWidth && !this.saving)
-        this.setSettings({
-          durationLimit: parseFloat(device.params.pulseWidth / 1000)
-        });
+    if (device.params && device.params.switches) {
+      if (device.params.switches[0].switch == "on") this.updateCapabilityValue("onoff", true);
+      if (device.params.switches[0].switch == "off") this.updateCapabilityValue("onoff", false);
+      if (device.params.switches[1].switch == "on") this.updateCapabilityValue("onoff.1", true);
+      if (device.params.switches[1].switch == "off") this.updateCapabilityValue("onoff.1", false);
+      if (device.params.switches[2].switch == "on") this.updateCapabilityValue("onoff.2", true);
+      if (device.params.switches[2].switch == "off") this.updateCapabilityValue("onoff.2", false);
+      if (device.params.switches[3].switch == "on") this.updateCapabilityValue("onoff.3", true);
+      if (device.params.switches[3].switch == "off") this.updateCapabilityValue("onoff.3", false);
     }
 
-    if (device.hasOwnProperty("online")) {
-      if (device.online) this.setAvailable();
-      else this.setUnavailable("Device is offline");
-    }
+    if (device.params.updateSource == "LAN") this.setStoreValue("api", "lan");
+    if (device.params.updateSource == "WS") this.setStoreValue("api", "ws");
 
-    if (device.hasOwnProperty("action")) {
-      if (device.params.online) this.setAvailable();
-      else if (!device.params.online) this.setUnavailable("Device is offline");
-    }
+    if (device.params.startup)
+      this.setSettings({
+        powerResponse: device.params.startup,
+      });
+
+    if (device.params.sledOnline)
+      this.setSettings({
+        networkLed: device.params.sledOnline,
+      });
+
+    if (device.params.pulse)
+      this.setSettings({
+        duration: device.params.pulse,
+      });
+
+    if (device.params.pulseWidth)
+      this.setSettings({
+        durationLimit: parseFloat(device.params.pulseWidth / 1000),
+      });
   }
 
   async onSettings(oldSettingsObj, newSettingsObj, changedKeysArr, callback) {
-    this.saving = true;
-    let params = {
+    let data = {
+      name: this.getName(),
+      deviceid: this.data.deviceid,
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
+    };
+
+    Homey.app.ewelinkApi.sendDeviceUpdate(data, {
       startup: newSettingsObj.powerResponse,
       sledOnline: newSettingsObj.networkLed,
       pulse: newSettingsObj.duration,
-      pulseWidth: newSettingsObj.durationLimit * 1000
-    };
-
-    let data = {
-      deviceid: this.data.deviceid,
-      apikey: this.data.apikey
-    };
-
-    Homey.app.ewelinkApi.setParams(data, params).then(() => {
-      this.saving = false;
-      callback(null, true);
+      pulseWidth: newSettingsObj.durationLimit * 1000,
     });
   }
 
   updateCapabilityValue(name, value, trigger) {
     if (this.getCapabilityValue(name) != value) {
-      this.setCapabilityValue(name, value);
+      this.setCapabilityValue(name, value)
+        .then(() => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability successfully updated");
+        })
+        .catch((error) => {
+          this.log("[" + this.data.deviceid + "]" + " [" + name + "] [" + value + "] Capability not updated because there are errors: " + error.message);
+        });
     }
   }
 
   registerChannelToggle(name, trigger) {
     let data = {
+      name: this.getName(),
       deviceid: this.data.deviceid,
-      apikey: this.data.apikey
+      apikey: this.data.apikey,
+      uiid: this.data.uiid,
+      api: "ws",
     };
-    this.registerCapabilityListener(name, async value => {
-      let channels = [{ outlet: 0, switch: "on" }, { outlet: 1, switch: "on" }, { outlet: 2, switch: "on" }, { outlet: 3, switch: "on" }];
+    this.registerCapabilityListener(name, async (value) => {
+      let switches = [
+        { outlet: 0, switch: this.getCapabilityValue("onoff") ? "on" : "off" },
+        { outlet: 1, switch: this.getCapabilityValue("onoff.1") ? "on" : "off" },
+        { outlet: 2, switch: this.getCapabilityValue("onoff.2") ? "on" : "off" },
+        { outlet: 3, switch: this.getCapabilityValue("onoff.3") ? "on" : "off" },
+      ];
       if (name == "onoff") {
-        channels[0].switch = value ? "on" : "off";
-        channels[1].switch = this.getCapabilityValue("onoff.1") ? "on" : "off";
-        channels[2].switch = this.getCapabilityValue("onoff.2") ? "on" : "off";
-        channels[3].switch = this.getCapabilityValue("onoff.3") ? "on" : "off";
+        switches[0].switch = value ? "on" : "off";
       } else if (name == "onoff.1") {
-        channels[0].switch = this.getCapabilityValue("onoff") ? "on" : "off";
-        channels[1].switch = value ? "on" : "off";
-        channels[2].switch = this.getCapabilityValue("onoff.2") ? "on" : "off";
-        channels[3].switch = this.getCapabilityValue("onoff.3") ? "on" : "off";
+        switches[1].switch = value ? "on" : "off";
       } else if (name == "onoff.2") {
-        channels[0].switch = this.getCapabilityValue("onoff") ? "on" : "off";
-        channels[1].switch = this.getCapabilityValue("onoff.1") ? "on" : "off";
-        channels[2].switch = value ? "on" : "off";
-        channels[3].switch = this.getCapabilityValue("onoff.3") ? "on" : "off";
+        switches[2].switch = value ? "on" : "off";
       } else if (name == "onoff.3") {
-        channels[0].switch = this.getCapabilityValue("onoff") ? "on" : "off";
-        channels[1].switch = this.getCapabilityValue("onoff.1") ? "on" : "off";
-        channels[2].switch = this.getCapabilityValue("onoff.2") ? "on" : "off";
-        channels[3].switch = value ? "on" : "off";
+        switches[3].switch = value ? "on" : "off";
       }
 
-      Homey.app.ewelinkApi.setPower2State(data, channels);
-      console.log("[INFO]: SonoffT12C -> registerToggle -> data" + data + " CAPAB " + name + " Channels " + JSON.stringify(channels));
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switches });
     });
   }
 
   registerToggleAction(name, action) {
     action.registerRunListener(async (args, state) => {
-      let channels = [{ outlet: 0, switch: "on" }, { outlet: 1, switch: "on" }, { outlet: 2, switch: "on" }, { outlet: 3, switch: "on" }];
-      if (name == "onoff") {
-        channels[0].switch = value ? "on" : "off";
-        channels[1].switch = args.device.getCapabilityValue("onoff.1") ? "on" : "off";
-        channels[2].switch = args.device.getCapabilityValue("onoff.2") ? "on" : "off";
-        channels[3].switch = args.device.getCapabilityValue("onoff.3") ? "on" : "off";
-      } else if (name == "onoff.1") {
-        channels[0].switch = args.device.getCapabilityValue("onoff") ? "on" : "off";
-        channels[1].switch = value ? "on" : "off";
-        channels[2].switch = args.device.getCapabilityValue("onoff.2") ? "on" : "off";
-        channels[3].switch = args.device.getCapabilityValue("onoff.3") ? "on" : "off";
+      let data = {
+        name: this.getName(),
+        deviceid: args.device.data.deviceid,
+        apikey: args.device.data.apikey,
+        uiid: this.data.uiid,
+        api: "ws",
+      };
+      let switches = [
+        { outlet: 0, switch: args.device.getCapabilityValue("onoff") ? "on" : "off" },
+        { outlet: 1, switch: args.device.getCapabilityValue("onoff.1") ? "on" : "off" },
+        { outlet: 2, switch: args.device.getCapabilityValue("onoff.2") ? "on" : "off" },
+        { outlet: 3, switch: args.device.getCapabilityValue("onoff.3") ? "on" : "off" },
+      ];
+      if (name == "onoff.1") {
+        if (action.id == "secondChannelOn") {
+          switches[1].switch = "on";
+        } else if (action.id == "secondChannelOff") {
+          switches[1].switch = "off";
+        } else if (action.id == "secondChannelToggle") {
+          switches[1].switch = "toggle";
+        }
       } else if (name == "onoff.2") {
-        channels[0].switch = args.device.getCapabilityValue("onoff") ? "on" : "off";
-        channels[1].switch = args.device.getCapabilityValue("onoff.1") ? "on" : "off";
-        channels[2].switch = value ? "on" : "off";
-        channels[3].switch = args.device.getCapabilityValue("onoff.3") ? "on" : "off";
+        if (action.id == "threeChannelOn") {
+          switches[2].switch = "on";
+        } else if (action.id == "threeChannelOff") {
+          switches[2].switch = "off";
+        } else if (action.id == "threeChannelToggle") {
+          switches[2].switch = "toggle";
+        }
       } else if (name == "onoff.3") {
-        channels[0].switch = args.device.getCapabilityValue("onoff") ? "on" : "off";
-        channels[1].switch = args.device.getCapabilityValue("onoff.1") ? "on" : "off";
-        channels[2].switch = args.device.getCapabilityValue("onoff.2") ? "on" : "off";
-        channels[3].switch = value ? "on" : "off";
+        if (action.id == "fourChannelOn") {
+          switches[3].switch = "on";
+        } else if (action.id == "fourChannelOff") {
+          switches[3].switch = "off";
+        } else if (action.id == "fourChannelToggle") {
+          switches[3].switch = "toggle";
+        }
       }
 
-      Homey.app.ewelinkApi.setPower2State(data, channels);
+      Homey.app.ewelinkApi.sendDeviceUpdate(data, { switches });
       return true;
     });
   }

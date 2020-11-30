@@ -6,17 +6,17 @@ const models = ["2.0-led"];
 class ABC20LED extends Homey.Driver {
   onInit() {
     this.actions = {
-      setRGBMode: new Homey.FlowCardAction("setRGBMode").register()
+      setRGBMode: new Homey.FlowCardAction("setRGBMode").register(),
     };
   }
 
   async onPairListDevices(data, callback) {
     await Homey.app.ewelinkApi
       .getDevices()
-      .then(devices => {
-        callback(null, this.deviceList(devices.devicelist.filter(device => models.includes(device.productModel))));
+      .then((devices) => {
+        callback(null, this.deviceList(devices.filter((device) => models.includes(device.productModel))));
       })
-      .catch(error => callback(new Error(error)));
+      .catch((error) => callback(new Error(error)));
   }
 
   deviceList(devices) {
@@ -28,17 +28,16 @@ class ABC20LED extends Homey.Driver {
         data: {
           deviceid: device.deviceid,
           apikey: device.apikey,
-          extra: device.extra.extra
+          uiid: device.extra.uiid,
         },
         settings: {
           brandName: device.brandName,
           model: device.productModel,
-          ip: device.ip,
           mac: device.params.staMac,
           fwVersion: device.params.fwVersion,
           powerResponse: device.params.startup,
-          networkLed: device.params.sledOnline
-        }
+          networkLed: device.params.sledOnline,
+        },
       };
       sortDevices.push(deviceList);
     }
