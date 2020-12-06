@@ -1,6 +1,6 @@
 {
   "name": "com.maxmudjon.ewelink",
-  "version": "1.1.3",
+  "version": "1.1.6",
   "description": "ewelink",
   "main": "app.js",
   "dependencies": {
@@ -8,6 +8,7 @@
     "color-convert": "2.0.1",
     "interval-promise": "1.4.0",
     "node-dns-sd": "0.4.2",
+    "rollbar": "^2.19.4",
     "websocket-as-promised": "1.1.0",
     "ws": "7.3.1"
   },
