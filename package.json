@@ -4,7 +4,7 @@
   "description": "ewelink",
   "main": "app.js",
   "dependencies": {
-    "axios": "0.21.0",
+    "axios": "1.6.0",
     "color-convert": "2.0.1",
     "interval-promise": "1.4.0",
     "node-dns-sd": "0.4.2",
